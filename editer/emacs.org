@@ -1,0 +1,51 @@
+** emacs
+*** 回到上次编辑过的地方
+C-u C-@
+*** 重复上一次的命令
+C-x z
+*** AutoComplete
+Alt-n or Alt-p 在不全提示中选择
+** 光标移动
+*** M-m 光标移动到第一个非空字符
+*** 移动到某一行 M-x goto-line; M-g g
+*** 普通移动
+**** 居中当前行 C-l
+**** 上下屏幕
+上一屏幕 M-v
+下一屏幕 C-v
+*** 跳词，行首/尾，段落，文件首尾
+**** 段落 M-} M-{
+**** 文件首尾
+文件开始 M-<
+文件结束 M->
+*** 跳括号/大括号
+*** 任意位置（avy/goto-char）
+avy 自定义快捷键，见配置文件
+*** 搜索
+****  C-s C-w 开始递增查找，把光标位置的单词做查找字符串
+** 编辑
+*** 格式化
+C-x h  (M-x mark-whole-buffer)
+C-M-\  (M-x indent-region)
+格式化插件：aggressive-indent
+*** 大小写 C-x C-l
+大写 C-x C-u
+*** 全选 C-x h
+*** 复制 Alt-w
+*** 切换buffer C-x b
+*** 替换 Alt-%
+*** 撤销
+**** 撤销上一条指令 C-_
+**** 无限撤销 C-/
+**** 撤销一次 C-x u
+**** undo-tree
+C-x u 进入 undo-tree-visualizer-mode , p n 上下移动，在分支之前 b f 左右切换，t 显示时间戳，选定需要的状态后， q 退出
+*** 补全  M-/
+** shell
+M-x shell starts classic shell
+M-x eshell starts shell written in emacs lisp
+M-x term start a terminal emulator
+** org
+C-c C-k 展开子树的所有标题
+** 缓冲区
+C-x C-b 查看所有缓冲，d标记删除，x执行，u取消标记，s保存缓冲，o缓冲区在新窗口显示，并选中该窗口，C-o缓冲在新窗口显示，但不选中该窗口，g刷新缓冲，q退出Buffer Menu

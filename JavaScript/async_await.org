@@ -1,0 +1,57 @@
+** async function
+*** 此声明用于定义一个返回AsyncFunction对象的异步函数，异步函数通过一个隐式的Promise返回其结果。async使得代码的语法和结构更像标准的同步函数
+*** 优点
+1. 更清晰明确的错误堆栈
+2. 调试时可以轻松给每个异步调用加断点
+*** 缺点
+1. 不能很好的支持异步并发
+#+BEGIN_SRC js
+// 一个模块需要发3个可以并发的请求，彼此之间无依赖关系
+async function mount() {
+    const result1 = await fetch('a.json');
+    const result2 = await fetch('b.json');
+    const result3 = await fetch('c.json');
+    render(result1, result2, result3);
+}
+
+// 缺点，3个请求是顺序执行的，没有利用异步的优势
+
+// 解决办法，依赖Promise.all
+async function mount() {
+    
+    const result = await Promise.all(fetch('a.json'), fetch('b.json'), fetch('c.json'));
+    render(...result);
+}
+
+
+#+END_SRC
+*** 错误处理
+**** try catch
+好处，传统，简单；也可以在单个try catch块中包装多个await调用，在一个地方处理所有错误；
+#+BEGIN_SRC js
+
+async getBookByAuthorWithAwait(authorId) {
+    try {
+        const books = await bookModel.fetchAll();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+#+END_SRC
+2. 需要手动给每个await添加try catch语句，否则，async函数返回的只是一个reject掉的Prommise
+3. 缺少复杂的控制流程，如always，pause等，无法中断abort
+**** async function可以返回两个值
+#+BEGIN_SRC js
+
+[err, user] = await to(UserModel.findById(1));
+
+#+END_SRC
+**** catch
+由于返回的是promsie，所以可以直接使用.catch处理。但这么处理不直观，是promise和async function的混合体，需要了解promise的工作原理
+#+BEGIN_SRC js
+
+let books = await bookModel.fetchAll()
+    .catch((error) => { console.log(error);})
+
+#+END_SRC

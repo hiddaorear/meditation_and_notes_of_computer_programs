@@ -1,0 +1,75 @@
+** 模版引擎
+*** 核心功能(jQuery作者John Resig的Micro-Templating)
+**** 运行嵌入代码和打印数据的办法
+**** 缓存编译模板的办法
+**** 访问映射数据的办法（with可以实现）
+*** 实现原理
+关键原理：动态执行JavaScript字符串
+
+常见模版引擎原理：
+
+模版代码：
+#+BEGIN_SRC js
+<h3>  
+<% if (typeof content === 'string') { %>  
+        <%= content %>  
+<% } %>  
+</h3>  
+#+END_SRC
+
+HTML语句与变量输出语句被直接输出，解析后的字符串类似:
+#+BEGIN_SRC js
+$out.push('<h3>');  
+if (typeof content === 'string') {  
+    $out.push(content);  
+}  
+$out.push('</h3>');  
+#+END_SRC
+
+语法分析之后返回渲染方法：
+#+BEGIN_SRC js
+var render = (function () {  
+    var cache =  
+    "var $out = [];\  
+    with ($data) {\  
+        $out.push('<h3>');\  
+        if (typeof content === 'string') {\  
+            $out.push(content);\  
+        }\  
+        $out.push('</h3>');\  
+    }\  
+    return $out.join('');"  
+      
+    return function (data) {   
+        var fn = new Function('$data', cache);   
+        return fn(data);  
+    }  
+})();  
+
+render({content: 'data'});
+#+END_SRC
+
+缺点：
+1. 性能：模版渲染依赖Function构造器，性能不好；
+2. 调试：不好调试，不容易定位错误源；
+
+*** artTemplate高性能原理
+**** 预编译
+在渲染之前编译赋值，普通的模版引擎是在渲染的时候动态编译。
+实现：根据简单的规则，提取所有模版变量，上面在渲染函数头部即可。
+#+BEGIN_SRC js
+
+var render = function($data) {
+    var content = $data.content, $out = '';
+    $out += '<h3>';
+    if (typeof content === 'string') {
+        $out += content;
+    }
+    $out =+ '</h3>';
+
+    return $out;
+}
+
+#+END_SRC
+**** 更快的字符串相加方式
+数组push与+=，在v8中+=较快；在IE6-8中push较快。同时采用之。

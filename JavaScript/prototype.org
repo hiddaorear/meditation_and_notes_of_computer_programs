@@ -1,0 +1,65 @@
+** 原型链
+*** JavaScript只有一种结构：对象
+*** 每一个实例对象(object)都有一个私有属性([[[[prototype]]]]或者__proto__)指向他的原型对象(prototype)
+*** 而原型对象也有自己的原型对象(__proto__)，层层向上直到原型对象为null
+*** null没有原型，并作为这个所形成的原型链的终点(null是关键字，而undefined不是关键字)
+*** 几乎所有的对象都是位于原型链顶端的object的实例
+** 顶层原型链
+*** Object.prototype是所有对象的原型，处于原型链的最顶层(null是终点)
+*** Function.prototype是所有函数对象的原型，包括构造函数
+*** JavaScript中对象可以分为三类，1. 用户创建的对象；2. 构造函数对象；3. 原型对象。每类对象都有proto属性，通过他追溯到原型链最底层，即Object.prototype
+*** 补充规则
+**** 构造函数对象有特有的prototype属性，指向原型对象，原型对象是实例可以继承的对象
+**** 被创建的对象的proto属性会指向构造函数的prototype属性
+**** 原型对象有constructor属性，指向他的构造函数
+*** 具体指向
+#+BEGIN_SRC js
+
+function Foo(){
+}
+var foo = new Foo();
+var obj = new Object();
+
+#+END_SRC
+[[prototype.png]]
+**** Funciton.prototype的__proto__指向Object.prototype
+**** Funciton.prototype的constructor指向Function
+**** Function的__proto__指向Funciton.prototype(Function也是对象，其__proto__指向当然是指向实例化他的Function，而Functin的prototype指向Function.prototype)
+**** Function的prototype指向Funciton.prototype(顺理成章，Function的prototype当然是Function.prototype)
+**** Object的__proto__指向Function.prototype(Object是对象，其__proto__自然指向能实例化他的Function，而Functin的prototype指向Function.prototype)
+**** Object的prototype指向Object.prototype
+**** 用户直接创建普通对象(new Object(); 或 {})obj的__proto__指向Object.prototype(obj自然指向Object.prototype，因为是直接用Object创建的，无需通过Function)
+**** 用户通过构造函数创建的对象(new Foo();)，其__proto__指向Foo.prototype
+**** 用户创建的函数Foo的prototype指向Foo.prototype，其__proto__指向Function.prototype
+**** Foo.prototype的__proto__指向Object.prototype(Foo.prototype也是对象)
+**** 总结
+***** 除非是通过明确的函数创建的，其__proto__指向Function.prototype，有三种情况：1. 用户创建的函数；2. Function；3. Object；
+***** 其他的__proto__指向Object.prototype，包括Function.prototype。这就是Object.prototype作为原型链顶层的体现。其中特殊情况，Object的__proto__的指向是Funciton.prototype，可以理解为Object对象是Function所new出来的。
+** 习题
+***  为什么Function.prototype 中添加一个属性 在Object里面可以访问到，但在Object的实例里面又访问不到？
+#+BEGIN_SRC js
+
+function fun (){
+    this.a = 2;
+}
+
+Function.prototype.s = 1;
+alert(Object.s);
+var a = new Object();
+alert(a.s);
+alert(fun.__proto__ === Function.prototype);
+alert(Function.__proto__=== Function.prototype);
+alert(Function.prototype === Object.__proto__);
+
+// 执行结果，第一个alert 1
+// 第二个alert undefined
+// 第三个alert true
+// 第四个alert true
+// 第五个alert true
+
+#+END_SRC
+分析：语句a = new T()，运行之后，满足的关系是：
+#+BEGIN_SRC js
+a.__proto__ === T.prototype
+#+END_SRC
+这就是说a的属性和T自身无关，只和T.prototype有关，修改T不会影响到a。Oject的实例s是来自Object.prototype，而非Function.prototype。

@@ -1,0 +1,28 @@
+** postMessage
+*** 使用
+**** window.postMessage()方法，可以安全地实现跨域通信
+**** 两个不同页面地脚本可以通信地条件
+***** 具有相同地协议（通常为https）
+***** 端口号（443为https地默认值）
+***** 主机（两个页面地Document.domain设置为相同地值）
+**** postMessage提供了一种受控地机制来规避限制，只要正确使用，就很安全
+**** postMessage参数
+#+BEGIN_SRC js
+otherWindow.postMessage(message, targetOrigin, [transfer]);
+#+END_SRC
+otherWindow： 其他窗口的一个引用，比如iframe的contentWindow属性、执行window.open返回的窗口对象、或者是命名过或数值索引的window.frames
+message：将要发送到其他 window的数据。它将会被结构化克隆算法序列化。这意味着你可以不受什么限制的将数据对象安全的传送给目标窗口而无需自己序列化
+targetOrigin：指定哪些窗口能接收消息，值可以是字符串"*"(表示无限制)或者一个URI。发送消息地时候，目标窗口地协议、主机地址或端口这三者任意一项不匹配targetOrigin提供地值，消息就不能发送
+**** receiveMessage
+#+BEGIN_SRC js
+
+window.addEventListener('message', reciveMessage, false);
+
+function receiveMessage(event) {
+    var origin = event.origin || event.originEvent.origin;
+    if (origin !== 'http://example.org:8080') {
+        return;
+    }
+}
+
+#+END_SRC

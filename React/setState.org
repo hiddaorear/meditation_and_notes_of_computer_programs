@@ -1,0 +1,51 @@
+* setState
+** setState是同步还是异步？
+*** 既不是同步也不是异步，官方回复：
+setState() does not always immediately update the component. It may batch or defer the update until later. 
+This makes reading this.state right after calling setState() a potential pitfall(潜在陷阱).
+官方给出的准确用词是batch later或defer，不是异步，同时用了may，即可能马上更新，可能不马上更新
+*** 由React控制的事件处理过程，setState不会同步更新state
+*** 在React之外的情况，setState会同步更新state
+** 原因
+*** setState方法执行是一个复杂过程，更新state，还要负责触发渲染。需要经过React的diff算法决定是否重新渲染，多个setState可能在执行过程中合并，故被设计为延时执行
+** 为什么不采用prommise方案？
+*** sebmarkbage
+Honestly, the current batching strategy comes with a set of problems right now. I'm hesitant to expand on it's API before we're sure that we're going to keep the current modle.
+I think of it as a temporary escape until we figure out something better.
+即问题的根源在于batching策略。在batching策略调整之前，盲目扩充setState接口是短视的。
+这里也会带来性能问题，所有setState都产生一个callback，需要存储，在合理的事件触发
+** setState
+*** 不会立即改变React组件的state的值
+#+BEGIN_SRC js
+
+function incrementMultiple() {
+  this.setState({count: this.state.count + 1});
+  this.setState({count: this.state.count + 1});
+  this.setState({count: this.state.count + 1});
+}
+
+#+END_SRC
+    这个incrementMultiple函数被调用是，count增加了3次，但实际结果只给state增加了1.因为在调用this.setState的时候，没有立即更新this.state，所以是在旧的值上反复设置而已。
+    
+    可以在setState中传入一个函数来避免这个问题。函数调用的时候，React会保证合并之前的状态修改结果，this.state的值并没有改变，还是要等到render函数重新指向。
+*** 通过引发一次组件的更新过程来引发重新渲染
+    如果shouldComponentUpdate返回false，或者返回true，直到下一次render函数调用时，才更新this.state。
+    setState与React生命周期息息相关
+*** 多次setState函数调用的效果会合并
+** 为什么不设计成直接修改this.state就更新？
+如果通过Object的setter功能，通过对this.state对象的直接修改来实现setState一样的功能，容易出现问题，就是我们修改了一个this.state对象居然会引发重新渲染的副作用。
+所以设计setState这个API较为合理。函数式编程的思想，让开发者写出无副作用的函数。setState不修改组件的状态，而是把状态给React，状态维护给React处理。
+** setState为什么不能设计成同步的，或异步的？
+如果setState调用返回，即可更新，会导致每一次setState更新组件，很浪费。同时，组件更新有四个生命周期：
+
+shouldComponentUpdate
+
+componentwillUpdate
+
+render
+
+componentDidUpdate
+
+每次setState调用都走一圈生命周期。在shouldComponentUpdate中，函数有两个参数，nextProps和nextState，当前的设计，shouldComponentUpdate调用的时候，state并没有改变。
+这个设计导致setState也不能设计异步触发组件更新。如果setState返回式，this.state值已经修改了，但没有立即引发更新过程，React把setState的结果放在异步队列里，等到时机成熟了才更新。
+还是以上生命周期的原因，因为shouldComponentUpdate和componentWillUpdate是假设this.state没有改变的。

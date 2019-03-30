@@ -1,0 +1,93 @@
+** try catch的使用
+*** 性能问题
+**** 代码无论在try中还是在catch中，性能消耗一样（要复制当前的词法作用域，复制try所有声明和变量来形成一个try-catch作用域，复制过程性能开销大）
+**** 性能消耗原因在于，不能塞进太多代码，声明太多变量，最后把所有要执行的代码放在另一个函数里，通过function来执行。尽量把try catch放在一个相对感觉的scope中
+*** 安全的对象属性访问，类似a.b.c.d
+#+BEGIN_SRC js
+
+function fn(obj) {
+    try {
+        return a.b.c.d;
+    } catch(e) {
+        return undefined;
+    }
+}
+
+#+END_SRC
+
+好处，避免每一个层级需要判断上一个层级的是否存在，如果不判断，访问undefined的属性值会报错。这是JS代码中非常常见的错误之一。
+还可以使用lodash.get。
+
+get的实现：
+#+BEGIN_SRC js
+
+// reduce
+function get1(obj, path) {
+    return path.reduce((obj, currPath) => {
+        if (obj !== null && obj !== undefined) {
+            return obj[currPath];
+        } else {
+            return obj;
+        }
+    }, obj);
+}
+
+// 递归
+function get2(obj, path) {
+    if (path.length) {
+        if (obj) {
+            let key = path.shift();
+            return get2(obj[key], path);
+        } else {
+            return obj;
+        }
+    } else {
+        return obj;
+    }
+}
+
+
+#+END_SRC
+*** with
+1.导入命名空间的作用
+2.在前端模版里使用
+#+BEGIN_SRC js
+
+width(document.body.style) {
+    backgroundRepeat = 'no-repeat';
+}
+
+(function(s) {
+    backgroundRepeat = 'no-repeat';
+})(document.body.style);
+
+#+END_SRC
+
+*** Let it Crash
+**** 不去捕获你不知道怎么处理的exception，由他报错crash
+*** throw error技巧
+继承Error，实现自定义的error
+#+BEGIN_SRC js
+
+class MyError extends Error {
+    constructor(msg) {
+        super(msg, code);
+        this.message = msg;
+        this.code = code;
+        this.name = 'MyError';
+    }
+}
+
+#+END_SRC
+
+更简单的办法
+#+BEGIN_SRC js
+
+function MyError(code, message) {
+    const err = {message, code};
+    Error.captureStackTrace(err)
+}
+
+#+END_SRC
+*** Promise中的错误处理
+见promise.org

@@ -1,0 +1,17 @@
+* vscode
+** Bookmarks
+Command+Option+k 加入书签
+Shift+Option+L 下一个书签
+Shift+Option+J 上一个书签
+** 快捷键
+cmd+shift+P / F1 万能键
+cmd+shift+F 全文搜索
+cmd+P 快速切换文件（比Atom智能）
+cmd+点击指定文件，将此文件在分屏栏打开
+cmd+D 多选
+cmd+E 打开命令行，其他指令其实都是基于命令行的，可直接在输入框输入来查询指令
+ctrl+G 跳转到指定行
+ctrl+tab 快速切换到上一个文件,多次按(shift)tab可以来回选择,也可以直接点击文件顶部名称来显示历史文件列表进行切换
+alt+↑/↓ 调整代码行整体上下移动
+alt+点击多处可以多光标操作，也可以alt+cmd+↑/↓多光标选择
+呼起终端 shift + command + Y

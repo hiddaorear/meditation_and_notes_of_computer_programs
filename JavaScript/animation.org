@@ -1,0 +1,152 @@
+** JavaScript动画
+*** setTimeout或者setInterval缺点
+**** 延时计算不精确。延时计算依赖浏览器内置时钟，时钟的精度依赖时钟的更新频率。IE8以及之前的IE历览器更新间隔为15.6ms，如果我们设置了60fps，即16.7ms一桢，则需要在两个间隔才会触发延迟
+**** 在异步队列中，回调函数并非立即执行
+*** 常见的实现
+速度控制动画
+
+#+BEGIN_SRC js
+
+let deg = 0;
+dom.addEventListener('click', function() {
+    let self = this;
+    requestAnimationFrame(function change() {
+        self.style.transform = `rotate(${deg++}deg)`;
+        requestAnimationFrame(change);
+    });
+});
+
+#+END_SRC
+缺点：
+1. requestAnimationFrame(setTimeout, setInterval)并不能保证严格的触发，如果被阻塞了，动画就会变慢
+2. 这种方式是通过定义速度，来实现动画，不好精确控制动画时间（类似于对元素属性求积分，但时间不能保证连贯）
+
+不能在规定时长中完成动画，原因：
+1. 如果有耗时任务，导致速度规律不好把握
+2. 无法控制动画时长（如果已知动画时长，和偏移量，则动画的定时器的执行次数是固定，这个无法保证）
+*** 位移是关于时间的函数
+动画是位移关于时间的函数。不应使用增量的方式来实现，而应该将时间和动画联系起来。
+#+BEGIN_SRC js
+
+function startAnimation() {
+    let startTime = Date.now();
+    requestAnimationFrame(function change() {
+        let current = Date.now() - start;
+        console.log('动画已执行时间: %fms', current);
+        requestAnimationFrame(change);
+    });
+}
+
+#+END_SRC
+
+支持循环播放的动画
+#+BEGIN_SRC js
+
+function startAnimation(duration, isLoop) {
+    let startTime = Date.now();
+
+    requestAnimationFrame(function change() {
+        let p = (Date.now() - startTime) / duration;
+
+        if (p >= 1.0) {
+            if (isLoop) {
+                startTime +=duration;
+                p -= 1.0;
+            } else {
+                p = 1.0;
+            }
+        }
+        console.log('动画已执行进度: %fms', p);
+        if (p < 1.0) {
+            requestAnimationFrame(change);
+        }
+    });
+}
+
+#+END_SRC
+缺点：
+1. 会掉帧；
+
+例子，滑块2s内向右匀速移动200px
+#+BEGIN_SRC js
+
+block.addEventListener("click", function(){
+  let self = this, startTime = Date.now(),
+      distance = 200, duration = 2000;
+
+  requestAnimationFrame(function step(){
+    let p = Math.min(1.0, (Date.now() - startTime) / duration);
+    self.style.transform = "translateX(" + (distance * p) +"px)";
+    if(p < 1.0) requestAnimationFrame(step);
+  });
+});
+
+#+END_SRC
+** CSS3动画
+*** CSS硬件加速
+**** 开启硬件加速：translate3d属性
+**** 缺点
+***** CPU和GPU之间的数据传输（他们之间总线宽带有限），可能造成通道拥挤
+**** 优点
+***** 在移动端，可以有效减少资源利用
+** requestAnimationFrame
+*** 平滑动画的两个要素
+**** 时机(Frame Timing)：新的一桢准备好的时机
+**** 成本(Frame Budget)：渲染新的一桢需要的时长
+*** requestAnimationFrame用处：解决以上的第一个问题，产生新的一桢的时机；无法解决第二个问题
+requestAnimationFrame发现无法维持60fps的频率的时，会降低频率到30fps，至少保持帧数稳定，保持动画连贯
+*** 使用requestAnimationFrame推迟代码的执行
+**** 浏览器的UI引擎和JavaScript互斥
+#+BEGIN_SRC js
+
+function jank(second) {
+    var start = +new Date();
+    while (start + second * 1000 > (+new Date())) {}
+}
+
+div.style.backgroundColor = "red";
+
+// some long run task
+jank(5);
+
+div.style.backgroundColor = "blue";
+
+#+END_SRC
+
+无论在任何的浏览器中运行上面的代码，你都不会看到div变为红色，页面通常会在假死5秒，然后容器变为蓝色。这是因为浏览器的始终只有一个线程在运行(可以这么理解，因为js引擎与UI引擎互斥)。虽然你告诉浏览器此时div背景颜色应该为红色，但是它此时还在执行脚本，无法调用UI线程。
+
+获取容器的宽度和背景颜色
+#+BEGIN_SRC js
+
+var div = document.getElementById("foo");
+
+var currentWidth = div.innerWidth;
+div.style.backgroundColor = "blue";
+
+// do some "long running" task, like sorting data
+
+#+END_SRC
+
+当我们请求innerWidth时，浏览器会以为我们马上需要，就立即更新容器样式（通常浏览器会攒着一批，等待合适时机一次性repaint，优化性能），并把计算结果告知我们，这里很消耗性能
+
+如果我们需要迫切知道innerWidth，我们可以使用这个API优化：
+#+BEGIN_SRC js
+
+requestAnimationFrame(function() {
+    var div = document.getElementById("foo");
+
+    var currentWidth = div.innerWidth;
+    div.style.backgroundColor = "blue";
+});
+
+// do some "long running" task, like sorting data
+#+END_SRC
+
+这样执行顺序会有所改变，会先执行"long running"，然后执行requestAnimationFrame里面的
+** 浏览器渲染
+html在浏览器中会被转化为DOM树，DOM树的每一个节点都会转化为RenderObject, 多个RenderObject可能又会对应一个或多个RenderLayer。浏览器渲染的流程如下：
+
+1. 获取 DOM 并将其分割为多个层(RenderLayer)
+2. 将每个层栅格化，并独立的绘制进位图中
+3. 将这些位图作为纹理上传至 GPU
+4. 复合多个层来生成最终的屏幕图像(终极layer，与硬件加速有关)。

@@ -1,0 +1,19 @@
+** 前端路由实现原理
+*** hash模式
+**** hashchange事件，可以监听地址的hash值的变化，通过这个特性，我们可以实现hash模式的前端路由
+*** history模式
+**** 新增的两个API: history.pushState() 和 history.replaceState() 
+这两个API的作用是可以操作浏览器的历史记录，而不会引起页面的刷新。但不同之处是pushState会增加一条新的记录，而后者是直接替换当前的历史记录。
+**** 同时了解一个onpopstate事件,它可以监听浏览器的前进后退事件，当我们点击前进后退的时候可以使得路由同时受控
+**** 实现细节
+hash 的改变会触发 onhashchange 事件，history 的改变不会触发事件，无法直接监听。我们可以拦截hsitory改变的途径，有3种：
+
+1. 点击浏览器的前进或者后退按钮
+
+2. 点击 a 标签
+   
+3. 在 JS 代码中直接修改路由
+
+第 2 和第 3 种途径可以看成是一种，因为 a 标签的默认事件可以被禁止，进而调用 JS 方法。关键是第 1 种，HTML5 规范中新增了一个 onpopstate 事件，通过它便可以监听到前进或者后退按钮的点击。
+要特别注意的是：调用history.pushState和history.replaceState并不会触发 onpopstate 事件。
+当路由发生变化时，跟当前 url 匹配的component正常渲染；跟当前 url 不匹配的 component 渲染为 null，仅此而已

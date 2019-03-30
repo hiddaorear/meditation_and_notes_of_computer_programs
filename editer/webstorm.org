@@ -1,0 +1,19 @@
+*** WebStorm
+*** 格式化代码
+Option+Command+l
+*** 文件内代码替换
+Command+R
+*** 格式化
+Command+Alt+L
+*** 减少缩进
+Shift+Tab
+*** 重新开始一行，无论光标在的位置
+Shift+Enter
+*** 到指定代码
+Command+G
+*** /**加回车，会自动生成 jsdoc 格式的注释
+*** AceJump
+Ctrl+;
+*** 跳转到定义
+Command+Click
+Command+B

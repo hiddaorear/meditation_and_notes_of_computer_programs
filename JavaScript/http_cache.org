@@ -1,0 +1,20 @@
+** 浏览器缓存
+*** 强缓存和协商缓存，不同点
+**** 强缓存不会发送请求到服务器，协商缓存会发送请求到服务器
+**** 命中强缓存，http返回200，但network里面的size会显示为from cache
+**** 命中协商缓存，http返回304，并显示Not Modified字符串
+*** 强缓存
+**** http response header
+***** Expires，表示资源过期的绝对时间点，由服务器返回。缺点：由于是绝对时间，当服务器时间与客户端时间相差较大的时候，缓存管理易出问题，如修改了客户端时间就能影响缓存的命中结果
+***** Cache-Control，资源过期的相对时间，如: max-age=315360000，为了规避Expires缺点设计的，利用客户端时间进行判断
+**** 特点
+***** 两个header可以同时启用，如果同时启用，Cache-Control高于Expire
+***** 当资源有更新的时候，通常利用给资源的url加动态参数，版本之类的，来强制更新资源
+*** 协商缓存
+**** http response header
+***** Last-Modified If-Modified-Since
+****** 第一次请求的时候服务器返回的Last-Modified，即服务器资源的最后修改时间。再次请求的时候，header带上If-Modified-Since，这个header的值即上次返回的Last-Modified的值，服务器根据这个值判断资源是否变化
+***** ETag If-None-Match
+****** 由于资源有变化，但最后修改时间没有变化，影响了Last-Modified的可靠性，ETag来补救这个缺点
+****** 第一次请求服务器时，服务器根据资源生成的一个唯一标识，再次请求的时候，request的header会带上If-None-Match这个header，这个header即上一次请求返回的ETag的值
+****** 协商缓存的由来，由于资源更新，客户端浏览器不一定知道，所以需要发送请求到服务器

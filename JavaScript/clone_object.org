@@ -1,0 +1,61 @@
+** clone
+*** clone应用
+一般是数据对象的传递，如postMessage发送，即数据的持久化上，可以被序列化和反序列化的数据。
+*** 深复制和浅复制区别
+深复制和浅复制，只针对Object，Array的复杂对象。浅复杂只复制了一层对象，而深复制则递归复制了所有层级
+*** 深复制
+JSON.parse(JSON.stringify( obj ))
+不能处理循环引用对象；
+Map, Set, RegExp, Date, ArrayBuffer 和其他内置类型在进行序列化时会丢失；
+也不处理对象内部的函数指针：
+#+BEGIN_SRC js
+var a = {
+    b: 1,
+    c: function(e) {}
+};
+
+// clone
+var clone_a = {b: 1};
+
+#+END_SRC
+jQuery —— $.extend(true, {}, x)
+lodash —— _.cloneDeep()
+*** 浅复制
+{...obj}
+Object.assign
+Underscore —— _.clone()
+jQuery —— $.extend({}, x)
+lodash —— _.clone()
+*** 循环引用问题
+#+BEGIN_SRC js
+
+var a = {name: b};
+var b = {name: a}
+
+$.extend(a, b);
+
+#+END_SRC
+
+解决办法，把对象存储起来，如果有环对象，就可以从里面检测出来。例如：
+#+BEGIN_SRC js
+
+function deepClone(obj, hash = new WeakMap()) {
+    if (!isObject(obj)) {
+        return obj;
+    }
+    // 查表
+    if (hash.has(obj))  return hash.get(obj);
+
+    let isArray = Array.isArray(obj);
+    let cloneObj = isArray ? [] : {};
+    hash.set(obj, cloneObj);
+
+    let result = Object.keys(obj).map(key => {
+        return {
+            [key]: deepClone(obj[key], hash)
+        }
+    });
+    return Object.assign(cloneObj, ...result);
+}
+
+#+END_SRC

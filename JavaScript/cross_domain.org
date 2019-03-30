@@ -1,0 +1,113 @@
+** 跨域问题
+*** 同源定义：域名、协议、端口均相同
+*** 浏览器为了安全，同源策略导致，非同源就是跨域
+*** 跨域方案
+**** 主域相同的跨域
+***** document.domain
+****** 只适用于不同子域的框架间的交互，及主域必须相同的不同源
+****** 页面可以更改自己的来源，但有一些限制。js可以将document.domain设置为当前域或其当前域的超级域
+假设文档中的一个脚本在 http://store.company.com/dir/other.html 执行以下语句：
+#+BEGIN_SRC js
+
+document.domain = 'company.com';
+
+#+END_SRC
+设置之后，页面将成功通过对http://company.com/dir/page.html 的同源检测
+****** 注意
+1. 浏览器单独保存端口号，任何赋值操作，都会以null值覆盖原来的端口号，因此，company.com:8080页面脚本不能仅仅通过设置document.domain = 'company.com'，赋值必须带上端口号。
+2. 设置父域和子域相同的值
+#+BEGIN_SRC js
+
+(1) 在www.a.com/a.html中：
+document.domain = 'a.com';
+var ifr = document.createElement('iframe');
+ifr.src =  'http://www.script.a.com/b.html';  
+ifr.display = none;
+document.body.appendChild(ifr);
+ifr.onload = function(){ 
+    var doc = ifr.contentDocument || ifr.contentWindow.document;                                                          
+    ifr.onload = null;
+};
+
+(2) 在www.script.a.com/b.html中：
+document.domain = 'a.com';//注意：使用document.domain允许子域安全访问其父域时，您需要设置document域在父域和子域中具有相同的值。这是必要的，即使这样做只是将父域设置回其原始值。否则可能会导致权限错误。这里都是a.com。
+
+#+END_SRC
+**** 完全不同源的跨域（两个页面之间的通信）
+***** location.hash
+假设域名a.com下的cs1.html要和b.com的cs2.html通讯。
+1. cs1.html首先创建一个隐藏的iframe，iframe的src指向b.com的cs2.html页面
+2. cs2.html响应请求后，在通过修改cs1.html的hash值来传递数据
+3. cs1.html页面加上一个定时器，或onhashchange事件，来获取URL的变化
+缺点：
+1. hash上的数据直接暴露在URL中
+2. URL大小的限制，支持传递的数据量不大
+***** window.name
+      window.name特别之处，在于name值在不同的页面，不同的域名，加载之后仍然存在，并且支持的长度达到2M
+#+BEGIN_SRC js
+
+// a页面
+ iframe = document.createElement('iframe');
+   iframe.style.display = 'none';
+   var state = 0;
+
+   iframe.onload = function() {
+     if(state === 1) {
+         var data = iframe.contentWindow.name;
+         console.log(data);
+         iframe.contentWindow.document.write('');
+         iframe.contentWindow.close();
+         document.body.removeChild(iframe);
+     } else if(state === 0) {
+         state = 1;
+         iframe.contentWindow.location = 
+         'http://m.zhuanzhuan.58.com:8887/b.html';
+     }
+   };
+   document.body.appendChild(iframe);
+
+// b页面
+window.name = 'hello';
+#+END_SRC
+***** postMessage
+****** HTML5为了解决这个问题，引入了一个全新的API：跨文档通信 API（Cross-document messaging）。这个API为window对象新增了一个window.postMessage方法，允许跨窗口通信，不论这两个窗口是否同源
+**** Ajax请求不同源的跨域
+***** JSONP
+***** 原理：网页通过添加一个<script>元素，向服务器请求JSON数据，这种做法不受同源政策限制；服务器收到请求后，将数据放在一个指定名字的回调函数里传回来
+利用<script>标签没有跨域限制的“漏洞”（历史遗迹啊）来达到与第三方通讯的目的。当需要通讯时，本站脚本创建一个<script>元素，地址指向第三方的API网址，
+形如：<script src="http://www.example.net/api?param1=1&param2=2"></script>并提供一个回调函数来接收数据（函数名可约定，或通过地址参数传递）。
+第三方产生的响应为json数据的包装（故称之为jsonp，即json padding），形如：callback({"name":"hax","gender":"Male"})这样浏览器会调用callback函数，并传递解析后json对象作为参数。本站脚本可在callback函数里处理所传入的数据。
+***** 缺点：只支持GET请求
+***** WebSocket
+WebSocket是一种通信协议，使用ws://（非加密）和wss://（加密）作为协议前缀。该协议不实行同源政策，只要服务器支持，就可以通过它进行跨源通信。
+***** 为什么WebSocker可以跨域？
+下面是一个例子，浏览器发出的WebSocket请求的头信息（摘自维基百科）。
+#+BEGIN_SRC js
+
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Origin: http://example.com
+
+#+END_SRC
+上面代码中，有一个字段是Origin，表示该请求的请求源（origin），即发自哪个域名。
+正是因为有了Origin这个字段，所以WebSocket才没有实行同源政策。因为服务器可以根据这个字段，判断是否许可本次通信。如果该域名在白名单内，服务器就会做出如下回应。
+***** CORS
+CORS（Cross-Origin Resource Sharing）跨域资源共享。
+CORS背后的基本思想就是使用自定义的HTTP头部让浏览器与服务器进行沟通，从而决定请求或响应是应该成功还是失败。
+服务器端对于CORS的支持，主要就是通过设置Access-Control-Allow-Origin来进行的。如果浏览器检测到相应的设置，就可以允许Ajax进行跨域的访问。
+后台需要加上Response header的响应头：
+
+#+BEGIN_SRC js
+//指定允许其他域名访问
+'Access-Control-Allow-Origin:*'//或指定域
+//响应类型
+'Access-Control-Allow-Methods:GET,POST'
+//响应头设置
+'Access-Control-Allow-Headers:x-requested-with,content-type'
+#+END_SRC
+

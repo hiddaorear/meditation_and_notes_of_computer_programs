@@ -1,0 +1,30 @@
+** svn命令行
+**** 常用命令
+*** checkout
+svn checkout  http://xxx
+从服务器获取代码
+*** update
+svn update
+从服务器拉取其他人的修改
+*** commit
+svn commit
+将工作提交到服务器
+*** log
+**** 查看最近4条日志
+svn log -l 4
+*** info
+**** 查看当前版本svn信息
+svn info
+主要有svn路径和工程版本号
+*** 更新远程代码到本地
+**** up
+svn up
+更新远程最新版本到本地
+*** diff
+svn st
+*** revert
+svn revert file.txt
+忽略对file.txt文件的修改
+*** add/delete
+svn add file.txt
+svn delete file.txt

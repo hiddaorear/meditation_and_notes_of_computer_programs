@@ -1,0 +1,40 @@
+** badjs上报
+*** JavaScript异常处理方式
+**** try catch
+缺点：1. 只能不会非异步错误
+2. 性能问题（新版浏览器似乎有改善）
+**** window.onerror
+优点：可以捕获异步和非异步错误；需要写在所有的JavaScript脚本之前
+缺点：
+1. 无法捕获网络异常，如图片请求的404（网络请求异常不会事件冒泡）；有解决办法：直接在捕获阶段捕获接口，然后配合服务端日志排查
+**** Promise错误
+Promise异常没有catch，无法捕获
+方案：
+#+BEGIN_SRC js
+
+window.addEventListener("unhandledrejection", function(e){
+  e.preventDefault()
+  console.log('我知道 promise 的错误了');
+  console.log(e.reason);
+  return true;
+});
+Promise.reject('promise error');
+new Promise((resolve, reject) => {
+  reject('promise error');
+});
+new Promise((resolve) => {
+  resolve();
+}).then(() => {
+  throw 'promise error'
+});
+
+#+END_SRC
+*** 异常上报方式
+**** ajax
+**** 动态创建img标签
+*** Script error问题
+静态资源CDN化，脚本来自不同的域。于同源策略，导致报错只输出Script error。
+方案：
+script标签添加crossOrigin，后台响应头加Access-Control-Allow-Origin
+*** 压缩脚本问题
+使用Sourcemap定位

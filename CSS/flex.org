@@ -1,0 +1,29 @@
+* flex布局
+** 优势
+*** 弹性盒子的优势的真正价值在于他的灵活性和响应性，窗口大小变动和新增元素，布局都是好的
+** 能很好处理以前不便处理的布局
+*** 垂直居中一个块内容
+*** 是容器的子项占用等量的可用宽度/高度，无论可用宽高的大小
+*** 多列布局使用相同高度，即使包含的内容不同
+** flex子项默认
+*** 子项等高等宽
+*** flex-direction的默认值为row，还可以设置为column列。理解：flex其实只能有一个主轴，改变direction则改变了主轴，column变纵向的轴。
+   row-reverse和column-reverse，改变了轴的方向
+** flex模型
+*** main axis 和 cross axis，沿这个两个轴来布局
+** 换行的处理
+*** flex-wrap可以设置wrap，会自动换行
+** flex的宽度
+*** flex设置为200px，每个元素至少200px
+*** 无单位的比例值，如flex:1，表示沿主轴的可用空间大小（设置margin和padding之后，剩余的空间），1表示占用空间相等。
+** flex-flow缩写
+*** flex-direction: row; flex-wrap: wrap; => flex-flow: row wrap;
+** align-items：控制flex的项在交叉轴上的位置和大小
+*** 默认值是stretch，flex项沿交叉轴法系拉伸填充父容器。如果父容器没有设置固定高度，则于最长的flex项一样长（可以理解为最长的撑开了父容器）
+*** center保持原有高度，并居中（实现垂直居中很方便）
+*** flex-start和flex-edn在交叉轴开始或结束对齐
+*** align-self可以覆盖父级设置align-items的行为，如：div:first-child{ align-self: flex-end;}
+** justify-content：控制flex项在主轴的位置
+*** flex-end和flex-start，在主轴的结束和开始
+*** center在主轴居中
+*** space-around，沿主轴均匀分布，而space-between沿主轴均匀分布，但不在两端留空间

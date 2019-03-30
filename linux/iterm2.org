@@ -1,0 +1,50 @@
+** iterms
+*** window操作
+**** 隐藏
+command + H
+**** 最大最小化窗口
+command + enter
+**** 分屏
+垂直分屏：command + d
+水平分屏：command + shift + d
+切换分屏：command-] 或 command-[
+*** tab操作
+**** 切换tab
+command + num
+command-方向键 切换分屏
+**** 切换Tab中的pane
+command + [  或者 command + opt + arrow
+**** 关闭panel
+command + w
+**** 最大化Tab中的pane，隐藏本Tab中的其他pane
+command + shift +enter , 再次还原
+**** 新建Tab
+command + t
+**** Tab 切换
+command + arrow 或者 command +shift + [
+**** 改变Tab的顺序
+command + shift + arrow
+**** 最大化Tab
+command + enter  再次还原
+****  快速定位到光标所在位置
+command + /
+**** 一屏显示所有窗口
+command + alt+ e
+*** 文本操作
+**** 按住command键
+1.可以拖拽选中的字符串；
+2.点击 url：调用默认浏览器访问该网址；
+3.点击文件：调用默认程序打开文件；
+4.如果文件名是filename:42，且默认文本编辑器是 Mac vim将会直接打开到这一行；
+5.点击文件夹：在 finder 中打开该文件夹；
+6.同时按住opt键，可以以矩形选中。
+**** 列出剪切板历史
+shift + command + h
+**** 查看历史命令
+command + ；
+**** 自动填充
+command  + ； 命令补全提示
+**** 打开最近目录
+command + alt + /
+**** 显示鼠标引导
+command + alt + ；  鼠标所在行高亮显示

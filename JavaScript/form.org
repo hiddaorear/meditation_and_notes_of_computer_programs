@@ -1,0 +1,140 @@
+** 表单
+*** 表单重复提交
+**** 场景
+***** 多次点击提交按钮
+***** 点击刷新按钮
+***** 点击浏览器后退按钮重复之前的操作
+***** 使用浏览器历史记录提交表单
+***** 浏览器重复http请求
+**** 常见方案
+***** 禁用按钮
+表单提交之后，服务器未返回之前，disable按钮。缺点，如果客户端禁用了js，则无效；如果用户修改了表单，此时也被阻止了，体验不好
+***** flag标识
+***** throttle/debounce
+在提交之后，通过一个变量来标识，通常是boolean值
+***** 服务端方案
+****** 利用session
+****** 使用redirect
+在提交成功之后，执行重定向，去提交成功的页面。避免了，F5导致的重复提交问题，消除了浏览器前进后退导致的问题
+***** 服务端和前端结合方案
+****** CSRF token
+**** 优化的方案
+常见的前端方案有一个显而易见的缺点，就是要维护状态。http拦截是好的方案，类似于有一个全局的管理器来统一管理这些操作
+简要的一个实现：
+#+BEGIN_SRC js
+
+var ActionManager = {};
+
+var actionName = url //提交的地址
+if(ActionManager[actionName])
+    return ;
+ActionManager[actionName]  = function(){};//某个操作的具体执行函数
+
+ActionManager[actionName].call(this);
+
+#+END_SRC
+
+***** http拦截具体实现
+#+BEGIN_SRC js
+
+// 设置缓存时间 和缓存请求数组
+var requestUrl = [], saveTime = 1000;
+http 拦截器中处理：
+const Interceptor = function (obj,callback) {
+
+    if (obj.method === 'POST') {
+        // 筛选在缓存时间内未过期请求 重新赋值缓存请求数组 新数组与当前请求url 匹配
+        // 如果有相等项 则判断为重复提交的请求 直接return
+        let nowTime = new Date().getTime();
+        requestUrl = requestUrl.filter((item) => {
+            return (item.setTime + saveTime) > nowTime;
+        });
+        let sessionUrl = requestUrl.filter((item) => {
+            return item.url === obj.url;
+        });
+        if (sessionUrl.length > 0) {
+            // console.log(obj.url + '请求重复 中断请求!');
+            return;
+        }
+        let item = { url: obj.url, setTime: new Date().getTime() };
+        requestUrl.push(item);
+    }
+    callback(obj);
+};
+
+#+END_SRC
+**** 阻止重复提交的思想
+***** 独占
+只允许同时提交一个，直到提交完成才能进行下一次提交
+#+BEGIN_SRC js
+
+module.submit = function() {
+    if (this.promise_.state() === 'pedding') {
+        return;
+    }
+    return this.promise_ = $.post('/api/save');
+}
+
+#+END_SRC
+***** 贪婪
+无限制的提交，但一最后一次操作为准
+#+BEGIN_SRC js
+
+module.submit = function() {
+    if (this.promise_.state() === 'pedding') {
+        this.promise_abort();
+    }
+}
+
+#+END_SRC
+***** 节制/惰性
+两次提交的时间间隔必须大于或等于某一个时间间隔
+#+BEGIN_SRC js
+
+module.submit = throttle(300, function() {
+    // ajax todo
+});
+
+module.submit = debounce(300, function() {
+    // ajax todo
+});
+
+#+END_SRC
+***** 累积
+把连续多次的提交合并为一个提交
+#+BEGIN_SRC js
+
+var request = makePile(5, function() {
+    $.post('/api', {list: JSON.stringify([].slice.call(arguments))});
+});
+
+request({a: 1});
+request({a: 2});
+request({a: 3});
+request({a: 4});
+request({a: 5});
+
+var makePile = function(count, onfilter, onvalue) {
+  var values = [], id = function(value) { return value }
+  return function(value) {
+    values.push((onvalue || id).apply(this, arguments))
+    if (values.length === count) {
+      onfilter.apply(this, values)
+      values = []
+    }
+  }
+}
+
+#+END_SRC
+
+***** 记忆
+同样的参数，其返回结果是恒等的（富文本编辑器，粘贴内容时抓取其中的链接信息，需要保证不能抓取两次）
+#+BEGIN_SRC js
+
+var scrape = memoize(function(url) {
+    return $.post('/api', {url: url});
+});
+
+#+END_SRC
+*** CSRF
+CSRF Token设计初衷是防止跨站请求伪造，根据其实现机制，只要用户提交后没有刷新页面，可以起到防止重复提交的作用

@@ -1,0 +1,41 @@
+** this
+*** 内部原理
+this是执行上下文的一个属性。
+
+#+BEGIN_SRC js
+
+activeExecutionContext = {
+  VO: {...},
+  this: thisValue
+}
+
+#+END_SRC
+在普通函数调用中，this是由激活上下文的调用者提供，即调用这个函数的父作用域，函数调用的语法形式，决定了this的值，这是一个动态可变的值。
+** 引用类型的不同处理，可能导致this的值不同
+引用类型存在形式：
+
+1 标识符（变量名，函数名，函数参数名，全局对象属性名）
+
+2 属性访问器（foo.bar(); foo['bar'](), 点标记法；可以动态设置属性名的方括号[]）
+
+为了从引用类型中获取真实的值，存在类似getValue的方法。
+函数上下文的规则是，函数上下文中this由调用者提供，并由调用形式决定。如果调用的圆括号左侧是一个引用类型，this为这个引用类型，如果是非引用类型，这为null，但为null无意义，被隐式转化为全局对象。
+** 题目
+#+BEGIN_SRC js
+
+var foo = {
+  bar: function() {
+    console.log(this)
+  }
+}
+
+foo.bar();
+(foo.bar)();
+
+(foo.bar = foo.bar)();
+(false || foo.bar)();
+(foo.bar, foo.bar)();
+
+#+END_SRC
+
+前两者为foo，后面都是全局对象。前两者没有没有调用GetValue，都是引用类型的。后面的赋值(3)，逗号(4)，逻辑表达式(5)失去了引用类型的值，而是得到函数类型的值，this的值被设置为全局对象。

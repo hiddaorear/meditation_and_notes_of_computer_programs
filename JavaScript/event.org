@@ -1,0 +1,82 @@
+** 浏览器事件
+*** touchstart 事件与 click 事件的冲突
+移动设备上的浏览器将会在 click 事件触发时延迟 300ms ，以确保这是一个“单击”事件而非“双击”事件。
+而对于 touchstart 事件而言，则会在用户手指触碰屏幕的一瞬间触发所绑定的事件。所以，使用 touchstart 替换 click 事件的意义在于，帮助用户在每次点击时节省 300ms 的时间。在页面频繁需要点击，或者点击发生在动画中，对动画流畅度有较高要求的情境下，使用这种技术是非常必要的。
+
+为了兼容PC和移动端，给某个元素同时绑定 touchstart 和 click 事件，这两个事件在移动设备上会发生冲突。
+由于移动设备能够同时识别 touchstart 和 click 事件，因此当用户点击目标元素时，绑定在目标元素上的 touchstart 事件与 click 事件（约300ms后）会依次被触发，也就是说，我们所绑定的回调函数会被执行两次。这显然不是我们想要的结果。
+
+解决方案：
+1. 使用preventDefault
+2. 检测PC和移动端，绑定事件
+#+BEGIN_SRC js
+
+const clickEvent = (function() {
+  if ('ontouchstart' in document.documentElement === true)
+    return 'touchstart';
+  else
+    return 'click';
+})();
+
+#+END_SRC
+*** 事件的三个阶段
+DOM2级事件规定事件包括三个阶段：
+1. 事件捕获阶段
+2. 处于目标阶段
+3. 事件冒泡阶段
+特别注意：元素的点击(或其他事件)时是先判断是否处于事件阶段二，即直接判断是否处于事件阶段二，此时已经处于事件阶段了，不需要捕获或者冒泡
+#+BEGIN_SRC js
+
+/*
+<div id="p">
+    parent
+    <div id="c">
+      child
+    </div>
+  </div>
+*/
+
+var p = document.getElementById('p'),
+    c = document.getElementById('c');
+
+p.addEventListener('click', function (e) {
+  alert('父节点冒泡')
+}, false);
+
+c.addEventListener('click', function (e) {
+  alert('子节点冒泡')
+}, false);
+c.addEventListener('click', function (e) {
+  alert('子节点捕获')
+}, true);
+
+p.addEventListener('click', function (e) {
+  alert('父节点捕获')
+}, true);
+
+#+END_SRC
+
+输出：
+父节点捕获
+子节点冒泡
+子节点捕获
+父节点冒泡
+
+*** React事件处理
+**** 原理
+React事件机制分为两个部分：1、事件注册 2、事件分发
+事件注册部分，所有的事件都会注册到document上，拥有统一的回调函数dispatchEvent来执行事件分发
+事件分发部分，首先生成合成事件，注意同一种事件类型只能生成一个合成事件Event，如onclick这个类型的事件，dom上所有带有通过jsx绑定的onClick的回调函数都会按顺序（冒泡或者捕获）会放到Event._dispatchListeners 这个数组里，后面依次执行它。
+**** 常见问题的答案
+1. e.stopPropagation不能阻止原生事件冒泡
+event是封装好的事件。他是在document的回调里进行封装，并执行回调的。而原生的监听，在document接收到冒泡时早就执行完了。
+2. e.nativeEvent.stopPropagation，回调无法执行。
+很简单，因为冒泡是从里到外，执行了原生的阻止冒泡，document当如捕捉不到，document都没捕捉到，React还玩个球啊，要知道，一切操作都放在docuemnt的回调里了。
+3. 怎么避免两者影响
+这个答案大家说了很多次，避免原生事件与React事件混用，或者通过target进行判断。
+**** 为什么这么设计
+一个Ul下面有1000个li标签。想在想为每个li都绑定一个事件，怎么操作？
+其实这个和jQuery事件委托差不多。通过最外层绑定事件，当操作是点击任何一个li自然会冒泡到最外面的Ul，又可以通过最外面的target获取到具体操作的DOM
+*** jQuery事件处理
+*** Vue事件处理
+*** 点击穿透
