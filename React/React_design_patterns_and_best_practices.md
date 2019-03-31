@@ -225,14 +225,35 @@ chrome-react-perf拓展。
 
 ## 资料
 
-- React总结，来源于Michele Bertoli著的《React设计模式于最佳实践》
+### todolist
+
+- [React Hooks issue - by Sebastian Markbåge ](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884)
+- [React 作者关于 Hooks 的深度 issue，值得你阅读](https://zhuanlan.zhihu.com/p/53375744)
+
+- [为什么顺序调用对 React Hooks 很重要？](https://overreacted.io/zh-hans/why-do-hooks-rely-on-call-order/)
+
 - [Hooks FAQ](https://reactjs.org/docs/hooks-faq.html#how-do-lifecycle-methods-correspond-to-hooks)
+
+- [React16 新特性](https://github.com/dt-fe/weekly/blob/master/83.%E7%B2%BE%E8%AF%BB%E3%80%8AReact16%20%E6%96%B0%E7%89%B9%E6%80%A7%E3%80%8B.md)
+
+- [精读《怎么用 React Hooks 造轮子》](https://github.com/dt-fe/weekly/blob/master/80.%E7%B2%BE%E8%AF%BB%E3%80%8A%E6%80%8E%E4%B9%88%E7%94%A8%20React%20Hooks%20%E9%80%A0%E8%BD%AE%E5%AD%90%E3%80%8B.md)
+- [阅读源码后，来讲讲React Hooks是怎么实现的](https://juejin.im/post/5bdfc1c4e51d4539f4178e1f)
+
+- [react hooks进阶与原理](https://zhuanlan.zhihu.com/p/51356920)
+- [深入 React Hook 系统的原理](https://www.jishuwen.com/d/2PLO#tuit)
+
+
+
+### done
+
+- React总结，来源于Michele Bertoli著的《React设计模式于最佳实践》
+
 - [精读《React Hooks》](https://github.com/dt-fe/weekly/blob/master/79.%E7%B2%BE%E8%AF%BB%E3%80%8AReact%20Hooks%E3%80%8B.md)
 - [A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
 - [精读《useEffect 完全指南》](https://github.com/dt-fe/weekly/blob/master/96.%E7%B2%BE%E8%AF%BB%E3%80%8AuseEffect%20%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97%E3%80%8B.md)
 - [精读《Function VS Class 组件](https://github.com/dt-fe/weekly/blob/master/95.%E7%B2%BE%E8%AF%BB%E3%80%8AFunction%20VS%20Class%20%E7%BB%84%E4%BB%B6%E3%80%8B.md)
-- [React16 新特性](https://github.com/dt-fe/weekly/blob/master/83.%E7%B2%BE%E8%AF%BB%E3%80%8AReact16%20%E6%96%B0%E7%89%B9%E6%80%A7%E3%80%8B.md)
-- [精读《怎么用 React Hooks 造轮子》](https://github.com/dt-fe/weekly/blob/master/80.%E7%B2%BE%E8%AF%BB%E3%80%8A%E6%80%8E%E4%B9%88%E7%94%A8%20React%20Hooks%20%E9%80%A0%E8%BD%AE%E5%AD%90%E3%80%8B.md)
-- [阅读源码后，来讲讲React Hooks是怎么实现的](https://juejin.im/post/5bdfc1c4e51d4539f4178e1f)
-- [react hooks进阶与原理](https://zhuanlan.zhihu.com/p/51356920)
-- [深入 React Hook 系统的原理](https://www.jishuwen.com/d/2PLO#tuit)
+
+## React博客和资料
+
+- [overreacted - by Dan Abramov](https://overreacted.io/)
+- [进击的React](https://zhuanlan.zhihu.com/advancing-react)
