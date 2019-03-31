@@ -23,7 +23,7 @@ Alan J. Perlis
 
 JSX顾名思义，是JavaScript和XML的结合。XML描述UI的结构，JavaScript操作UI。二者混在一起的时候，JS可能有描述UI的能力。二者在React中结合运用的例子：函数子组件。
 
-### 函数子组件
+### 函数子组件:renderProps?
 
 ``` javascript
 
@@ -87,6 +87,31 @@ const MyCompontentWithClassName = withClassName(MyComponent);
 
 高阶组件可以进一步，使用函数的能力，如：柯里化。
 
+### Hooks
+
+React函数式编程化。
+
+#### Capture Value
+
+值不可变特性。
+
+#### useEffect
+
+怎么处理副作用。
+
+#### Redux and useReducer
+
+局部状态管理。
+
+#### example
+
+经典使用例子。
+
+#### 实现原理(Array)
+
+ 不要在循环，条件判断，嵌套函数里面调用Hooks，其原因是什么？
+
+
 ## 组件抽象
 
 ### dumb Component & smart Component
@@ -141,6 +166,7 @@ class RightButton extent React.Component {
 
 ### DOM抽象
 
+- ref
 - on开头的属性，表示在向React描述期望达成的行为，不会向底层DOM节点添加真正的事件处理器。React在根节点上添加了单个的事件处理器，利用事件冒泡，做事件代理，可以优化性能。
 - 不宜在DOM上展开props对象。`<div {...props}/>`
 
@@ -166,6 +192,9 @@ class RightButton extent React.Component {
 ### context
 
 ### 数据流库
+
+- Redux
+- Mobx
 
 ## 工程工具
 
@@ -196,4 +225,14 @@ chrome-react-perf拓展。
 
 ## 资料
 
-React总结，来源于Michele Bertoli著的《React设计模式于最佳实践》
+- React总结，来源于Michele Bertoli著的《React设计模式于最佳实践》
+- [Hooks FAQ](https://reactjs.org/docs/hooks-faq.html#how-do-lifecycle-methods-correspond-to-hooks)
+- [精读《React Hooks》](https://github.com/dt-fe/weekly/blob/master/79.%E7%B2%BE%E8%AF%BB%E3%80%8AReact%20Hooks%E3%80%8B.md)
+- [A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
+- [精读《useEffect 完全指南》](https://github.com/dt-fe/weekly/blob/master/96.%E7%B2%BE%E8%AF%BB%E3%80%8AuseEffect%20%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97%E3%80%8B.md)
+- [精读《Function VS Class 组件](https://github.com/dt-fe/weekly/blob/master/95.%E7%B2%BE%E8%AF%BB%E3%80%8AFunction%20VS%20Class%20%E7%BB%84%E4%BB%B6%E3%80%8B.md)
+- [React16 新特性](https://github.com/dt-fe/weekly/blob/master/83.%E7%B2%BE%E8%AF%BB%E3%80%8AReact16%20%E6%96%B0%E7%89%B9%E6%80%A7%E3%80%8B.md)
+- [精读《怎么用 React Hooks 造轮子》](https://github.com/dt-fe/weekly/blob/master/80.%E7%B2%BE%E8%AF%BB%E3%80%8A%E6%80%8E%E4%B9%88%E7%94%A8%20React%20Hooks%20%E9%80%A0%E8%BD%AE%E5%AD%90%E3%80%8B.md)
+- [阅读源码后，来讲讲React Hooks是怎么实现的](https://juejin.im/post/5bdfc1c4e51d4539f4178e1f)
+- [react hooks进阶与原理](https://zhuanlan.zhihu.com/p/51356920)
+- [深入 React Hook 系统的原理](https://www.jishuwen.com/d/2PLO#tuit)
