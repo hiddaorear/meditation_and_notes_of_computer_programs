@@ -196,6 +196,12 @@ class RightButton extent React.Component {
 - Redux
 - Mobx
 
+## 不推荐的实践
+
+[You Probably Don't Need Derived State](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html)
+
+[[译] 你可能不需要 Derived State](https://zhuanlan.zhihu.com/p/38090110)
+
 ## 工程工具
 
 ## storybook
