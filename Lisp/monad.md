@@ -25,16 +25,19 @@ int random()
 
 在Haskell中`（旧种子）---> （新随机数，新种子）`。由于Haskell中不允许赋值语句`seed = next_random(seed)`，想办法把种子`seed`放在函数的参数里，这样来接受输入。进一步，Monad在这个情形中，可以认为是用函数的参数实现了赋值语句的能力，赋值被Monad隐藏了。
 
-todo
-赋值表面上是看不见的。顺序计算表面上看是并行的。
 
 但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
 
 编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。
-IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”好莱坞原则"，据说是好莱坞经纪人的口头禅。
-IoC在编程中的典型例子：回调函数。回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
+IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”好莱坞原则"，据说是好莱坞经纪人的口头禅。 IoC在编程中的典型例子：回调函数。`sync(param,cb)`，`sync`执行结束，才执行`cb`。从写法上看，似乎sync和cb是并行执行的。
+
+综上，Monad的效果：赋值表面上是看不见的，顺序计算表面上是并行的。
+
+回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
 
 ## Promise(Continuation Monad)
+
+### 初略验证Promise是Monad
 
 Promise即Cont Monad处理异步很有用。
 
@@ -78,8 +81,197 @@ Promise
 
 ```
 
+### 由CPS实现Promise
+
+#### 组合函数
+
+``` JavaScript
+const add1 = x => x + 1;
+const mul3 = x => x * 3;
+const compose = (fn1, fn2) => x => fn1(fn2(x));
+const addOneThenMul3 = compose(mul3, add1)
+console.log(addOneThenMul3(4)) // 打印 15
+
+```
+
+`addOneThenMul3`由`add1`和`mul3`组合而成。
+
+更复杂一点的例子，由两个Ajax请求，前一个请求返回后一个请求的url。
+
+1. 假设请求syncAjax是同步请求：
+
+``` JavaScript
+const sync = url => {return syncAjax(url);};
+const compose = (fn1, fn2) => x => fn1(fn2(x));
+const result = compose(syncAjax, syncAjax)(urlString);
+```
+
+2. CPS处理异步请求ajax
+
+``` JavaScript
+const async = (url, cb) => ajax(url, cb);
+const composeCPS = (fn1, fn2) => (x, cb) => fn1(x, x1 => fn2(x1, cb));
+composeCPS(async, async)(urlString, reslut => console.log(result));
+```
+
+3. 柯里化
+
+``` JavaScript
+const async = url => cb => ajax(url, cb);
+const composeCPS = (fn1, fn2) => x => cb => fn1(x)(x1 => fn2(x1)(cb));
+composeCPS(async, async)(urlString)(reslut => console.log(result));
+```
+
+4. 添加done
+
+``` JavaScript
+const async = url => {
+    return {
+        done: cb => ajax(url, cb)
+    };
+};
+const composeCPS = (fn1, fn2) => x => {
+    return {
+        done: cb => fn1(x).done(x1 => (fn2(x1).done(cb)))
+    };
+}
+
+composeCPS(async, async)(urlString)
+    .done(reslut => console.log(result));
+```
+
+5. 构造unit(Promise的resolve，或then，then也会返回Promise，这为了方便起见，只构造then)
+
+a. 组合对象从函数，修改为doneObj
+
+``` JavaScript
+const createDoneObj = done  => {{done}};
+
+const async = url => {
+    return createDoneObj(cb => ajax(url, cb)) ;
+};
+
+// 较大的修改，把第一个参数修改为doneObj
+const bindDone = (doneObj, fn2) => {
+    return createdDoneObj(cb => doneObj.done(x => (fn2(x).done(cb))));
+};
+
+bindDone(async(urlSting), async)
+    .done(reslut => console.log(result));
+
+```
+
+
+b. bindDone放入createThenObj
+
+``` JavaScript
+const createThenObj = done => ({
+    done,
+    then(fn) {
+        return fn.done ? fn.done : createThenObj(cb => this.done(x => (fn(x).done(cb))));
+    }
+});
+
+const async = url => {
+  return createThenObj(cb => {
+    ajax(url, cb)
+  })
+};
+
+async('urlString')
+    .then(async)
+    .done(result => console.log(reslut));
+```
 
 ## Monad典型种类与JavaScript实现
+
+### 最简单的Monad: Identity Monad
+
+仅仅是wrap一个值。
+
+``` JavaScript
+function Identity(value) {
+    this.value = value;
+}
+
+Identity.prototype.bind = funciton (transform) { return transform(this.value)};
+new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
+```
+
+### Maybe Monad
+
+除了像Identity Monad存储值，还可以表征缺少值。如果计算遇到Nothing，则随后的计算停止，直接返回Nothing。
+
+``` JavaScript
+
+function Just(value) {
+    this.value = value;
+}
+
+Just.prototype.bind = function (transform) { return transform(this.value)};
+
+let Nothing = {
+    bind: function() {
+        return this;
+    }
+};
+
+let result = new Just(5).bind(value =>
+                 Nothing.bind(value2 =>
+                      new Just(value + value2)));
+
+```
+
+可以用于因为null而产生的错误：
+
+``` JavaScript
+
+function getUser() {
+    return {
+        getAvatar: function() {
+            return null; // no avatar
+        }
+    };
+}
+
+// 捕获异常
+try {
+    var url = getUser().getAvatar().url;
+    print(url); // this never happens
+} catch (e) {
+    print('Error: ' + e);
+}
+
+// 或者做null检测
+var user = getUser();
+if (user !== null) {
+    var avatar = user.getAvatar();
+    if (avatar !== null) {
+        url = avatar.url;
+    }
+}
+
+// 使用Maybe Monad
+
+function getUser(){
+    return new Just({
+        getAvatar: function() {
+            return Nothing; // no avatar
+        }
+    });
+
+url = getUser()
+        .bind(user => user.getAvatar())
+        .bind(avatar => avatar.url);
+}
+
+if (url instanceof Just) {
+    print('URL has value: ' + url.value);
+} else {
+    print('URL is empty.');
+}
+
+```
 
 ## React Hooks
 
