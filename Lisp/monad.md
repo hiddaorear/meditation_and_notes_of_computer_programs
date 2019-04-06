@@ -30,7 +30,9 @@ todo
 
 但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
 
-编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。IoC在编程中的典型例子：回调函数。回调函数的使用会导致很多问题，在JavaScript中，其他的CPS方案来处理，其中有Promise。我们从Monad的层面来分析一下Promise。
+编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。
+IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”好莱坞原则"，据说是好莱坞经纪人的口头禅。
+IoC在编程中的典型例子：回调函数。回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
 
 ## Promise(Continuation Monad)
 
