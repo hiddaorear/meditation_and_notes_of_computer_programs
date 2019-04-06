@@ -28,11 +28,9 @@ int random()
 todo
 赋值表面上是看不见的。顺序计算表面上看是并行的。
 
-todo
-CPS是计算中的延续，只是Monad中的一种，适合IoC场景。
-
 但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
 
+编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。IoC在编程中的典型例子：回调函数。回调函数的使用会导致很多问题，在JavaScript中，其他的CPS方案来处理，其中有Promise。我们从Monad的层面来分析一下Promise。
 
 ## Promise(Continuation Monad)
 
