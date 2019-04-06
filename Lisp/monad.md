@@ -4,13 +4,84 @@
 
 ## 直观感觉
 
-Monad是一个抽象的数学概念，不容易给出直观的准确描述。看了很多人对Monad的讲述，我认为，王垠对Lisp的评判的文章《函数式语言的宗教》中，用随机数生成函数的例子，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的”不纯函数“。
+Monad是一个抽象的数学概念，不容易给出直观的准确描述。类似的有量子力学里的波粒二象性和自旋向上、自旋向下，本质上要通过数学去感知，很难找到既是粒子也是波的可感知的物品，也很难找到一个在三维空间中只有两个方向的可感知的物品。读了很多人对Monad的讲述，我认为，王垠对Lisp的评判的文章《函数式语言的宗教》中的例子：用随机数生成函数，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的”不纯函数。恰到好处地描述了Monad在编程的本质。
 
 > 为了达到“纯函数”的目标，我们需要做很多“管道工”的工作，这增加了程序的复杂性和工作量。如果我们可以把种子存放在一个全局变量里，到需要的时候才去取，那就根本不需要把它传来传去的。除 random() 之外的代码，都不需要知道种子的存在。
 
 > 为了减轻视觉负担和维护这些进进出出的“状态”，Haskell 引入了一种叫 monad 的概念。它的本质是使用类型系统的“重载”（overloading），把这些多出来的参数和返回值，掩盖在类型里面。
 
-## Promise
+从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看做带状态的函数，如State Monad。Monad不仅仅是用来处理副作用，当然有副作用的典型：IO Monad.
+
+从王垠的例子：
+
+``` c
+int random()
+{
+  static int seed = 0;
+  seed = next_random(seed);
+  return seed;
+}
+```
+
+在Haskell中`（旧种子）---> （新随机数，新种子）`。由于Haskell中不允许赋值语句`seed = next_random(seed)`，想办法把种子`seed`放在函数的参数里，这样来接受输入。进一步，Monad在这个情形中，可以认为是用函数的参数实现了赋值语句的能力，赋值被Monad隐藏了。
+
+todo
+赋值表面上是看不见的。顺序计算表面上看是并行的。
+
+todo
+CPS是计算中的延续，只是Monad中的一种，适合IoC场景。
+
+但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
+
+
+## Promise(Continuation Monad)
+
+Promise即Cont Monad处理异步很有用。
+
+unit funciton，warp数据返回Promise：`Promise.resolve(value)`
+bind funciton，变换数据并返回Promise： `Promise.prototype.then(onFullfill: value => Promise)`
+
+证明单位元：e + a = a
+
+``` JavaScript
+Promise.resolve(Promise.resolve(3)).then(result => console.log(result));
+// 3
+
+Promise.resolve(3).then(result => console.log(result));
+// 3
+```
+
+证明结合律： (a + b) + c = a + (b + c)
+
+``` JavaScript
+
+// (a + b) + c
+Promise
+    .resolve(5)
+    .then(value => Promise
+                    .resolve(6)
+                    .then(value2 => (value + value2)))
+    .then(value => Promise
+                    .resolve(7)
+                    .then(value3 => (value + value3)))
+    .then(result => console.log(result));
+
+// a + (b + c)
+Promise
+    .resolve(5)
+    .then(value => value)
+    .then(value1 => Promise.resolve(6)
+                        .then(value2 => Promise
+                                            .resolve(7)
+                                            .then(value3 => (0 + value1 + value2 + value3))))
+    .then(result => console.log(result));
+
+```
+
+
+## Monad典型种类与JavaScript实现
+
+## React Hooks
 
 ## scheme的流和Monad
 
@@ -62,7 +133,7 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 对于任何整数a，存在另一个整数b使得a + b = b + a = 0。整数b叫做整数a的逆元，记为−a。
 
-[群](https://zh.wikipedia.org/wiki/%E7%BE%A4#cite_note-3)
+[群wiki](https://zh.wikipedia.org/wiki/%E7%BE%A4#cite_note-3)
 
 ### 半群semigroup
 
@@ -78,10 +149,10 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 #### 例子
 
-作为一种平凡的情形，空集 {\displaystyle \varnothing } \varnothing 是一个半群。
+作为一种平凡的情形，空集是一个半群。
 正整数带有加法运算。
 
-[半群](https://zh.wikipedia.org/wiki/%E5%8D%8A%E7%BE%A4)
+[半群wiki](https://zh.wikipedia.org/wiki/%E5%8D%8A%E7%BE%A4)
 
 ### 幺半群monoid
 
@@ -122,7 +193,7 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 - 自然数N是加法及乘法上的可交换幺半群。
 
-[幺半群](https://zh.wikipedia.org/wiki/%E5%B9%BA%E5%8D%8A%E7%BE%A4)
+[幺半群wiki](https://zh.wikipedia.org/wiki/%E5%B9%BA%E5%8D%8A%E7%BE%A4)
 
 ### 范畴
 
@@ -148,9 +219,9 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 小范畴是一个ob(C)和hom(C)都是集合而不是真类的范畴。不是小范畴的范畴则称之为大范畴。局部小范畴是指对所有物件a和b，态射类hom(a,b)都会是集合（被称之为态射集合）的一个范畴。许多在数学中的重要范畴（如集合的范畴），即使不是小范畴，但也都至少会是局部小范畴。
 
-[范畴](https://zh.wikipedia.org/wiki/%E7%AF%84%E7%96%87_(%E6%95%B8%E5%AD%B8))
+[范畴wiki](https://zh.wikipedia.org/wiki/%E7%AF%84%E7%96%87_(%E6%95%B8%E5%AD%B8))
 
-[范畴论](https://zh.wikipedia.org/wiki/%E8%8C%83%E7%95%B4%E8%AE%BA)
+[范畴论wiki](https://zh.wikipedia.org/wiki/%E8%8C%83%E7%95%B4%E8%AE%BA)
 
 ### 态射
 
@@ -180,7 +251,7 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 当C是一个具体范畴的时候，复合只是通常的函数复合，恒等态射只是恒等函数，而结合律是自动满足的。（函数复合是结合的。）
 
-[态射](https://zh.wikipedia.org/wiki/%E6%80%81%E5%B0%84)
+[态射wiki](https://zh.wikipedia.org/wiki/%E6%80%81%E5%B0%84)
 
 ### 函子Functor
 
@@ -188,7 +259,7 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。看
 
 函子会保持单位态射与态射的复合。一个由一范畴映射至其自身的函子称之为“自函子”。
 
-[函子](https://zh.wikipedia.org/wiki/%E5%87%BD%E5%AD%90)
+[函子wiki](https://zh.wikipedia.org/wiki/%E5%87%BD%E5%AD%90)
 
 ### group/semigroup/monoid的命名
 
@@ -216,10 +287,6 @@ Monoid 么半群 : C.A. + N (= Id) => Mono + Id
 
 [数学中代数的有两个名词：环，半群，请问环为什么叫做环，它和汉字里的环（字典中的意思）有什么相同之处；同样，半群为什么叫做半群，这个”半“字是怎么解释呢？](https://www.zhihu.com/question/20564445)
 
-## Monad典型种类与JavaScript实现
-
-## React Hooks
-
 ## Monad缺点
 
 Dijkstra语录：
@@ -240,17 +307,9 @@ SICP
 
 - [陈年译稿——一个面向Scheme程序员的monad介绍](http://www.cnblogs.com/fzwudc/archive/2011/04/19/2020982.html)
 
-- []()
+- [从函数式编程到Promise](https://blog.fundebug.com/2017/06/21/write-monad-in-js/)
 
-- []()
-
-- []()
-
-- []()
-
-- []()
-
-- []()
+- [Monads in JavaScript](https://curiosity-driven.org/monads-in-javascript#)
 
 ## change log
 
