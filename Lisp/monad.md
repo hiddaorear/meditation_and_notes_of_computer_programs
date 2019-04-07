@@ -10,7 +10,7 @@ Monad是一个抽象的数学概念，不容易给出直观的准确描述。类
 
 > 为了减轻视觉负担和维护这些进进出出的“状态”，Haskell 引入了一种叫 monad 的概念。它的本质是使用类型系统的“重载”（overloading），把这些多出来的参数和返回值，掩盖在类型里面。
 
-从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看做带状态的函数，如State Monad。Monad不仅仅是用来处理副作用，当然有副作用的典型：IO Monad.
+从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看作有状态的函数，如State Monad。Monad不仅仅是用来处理副作用，典型的处理副作用的Monad：IO Monad.
 
 从王垠的例子：
 
@@ -229,7 +229,7 @@ let result = new Just(5).bind(value =>
 function getUser() {
     return {
         getAvatar: function() {
-            return null; // no avatar
+            return Nothing; // no avatar
         }
     };
 }
@@ -256,7 +256,11 @@ if (user !== null) {
 function getUser(){
     return new Just({
         getAvatar: function() {
-            return Nothing; // no avatar
+            if (hasAvatar) {
+                return new Just(avatar);
+            } else {
+                return null; // no avatar
+            }
         }
     });
 
@@ -264,6 +268,9 @@ url = getUser()
         .bind(user => user.getAvatar())
         .bind(avatar => avatar.url);
 }
+
+// 这样写，似乎会导致一个麻烦，不知道哪一步产生了null值。
+// 这个写法本质上，消除了赋值语句，而正是赋值语句报错或判空，才知道是哪一步有问题。
 
 if (url instanceof Just) {
     print('URL has value: ' + url.value);
@@ -275,7 +282,249 @@ if (url instanceof Just) {
 
 ## React Hooks
 
+### 问题
+
+#### Sophie Alpert，Hooks为了解决三个问题：
+
+> 1. Reusing logic.目前的解决方案是HOCs和Render props，这两种方式会造成Components的不断嵌套，代码很难维护。 Giant components.
+2. react component中的有许多的lifecycle，在不同的lifecycle里面做不同的事情，开发人员需要将注意力分散到不同的lifecycle中去。
+3. Confusing classes. 基于class的component让初学者难以理解，同时runtime优化也很难做到。
+
+#### this指针
+
+class中用bind或箭头函数。
+
+#### 复用
+
+复用业务代码很麻烦。拆组件，然后要么render props，或render childrend，要么HoC，最不济props。修改组件就很麻烦。如果设计得要更灵活，就导致props或组件增加很多
+
+
+写法上组件有wrapper hell问题，嵌套太深，性能也不好。
+
+组件化有适用范围，只有基础的东西才值得组件化。
+
+生命周期容易被滥用。容易出现面向对象的lifecycle写法。
+
+### 抽象理解
+
+- useState(State Monad)
+- useEffect(_->Algebraic Effect) 注入Algebraic Effect。
+Algebraic Effect简单来说是generator without
+yield。直观理解，如果render函数是一个generator，可以适当的时候yield出执行权(useState)，让框架做点事情(如记录state到VDOM)，然后框架再把render需要的数据返回到yield处(如上次的state和setState函数)
+
+### 直观感受
+
+useState隐藏了状态，但由于有this这种用来匹配状态和存储位置的指针的存在，也可能导致问题。
+
+### 典型用法
+
+shouldComponentUpdate对应的是React.memo
+
+#### useReducer
+
+``` JavaScript
+const initialState = {count: 0};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {count: state.count + 1};
+    case 'decrement':
+      return {count: state.count - 1};
+    default:
+      throw new Error();
+  }
+}
+
+function Counter({initialState}) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({type: 'increment'})}>+</button>
+      <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+    </>
+  );
+}
+```
+
+### 优缺点
+
 ## scheme的流和Monad
+
+我们设计一个过程rand，每次调用会返回一个随机选出的整数。
+
+假定我们有一个计算函数rand-update，同一个输入，会产生同一个输出。这个函数的性质是，如果从一个给定的数X1开始，执行下面的操作：
+- x2 = (rand-update x1)
+- x3 = (rand-update x2)
+得到的序列x1,x2,x3,...将具有我们所希望的性质。
+
+如果随机是序列中每一个数与前一个数无关，那么rand-update生成的数列肯定不是随机的。真正的随机序列与伪随机序列的关系很复杂。
+
+### 赋值和局部状态
+
+如果允许赋值，我们可以把rand实现为：
+
+``` scheme
+
+(define rand
+    (let ((x random-init))
+        (lambda ()
+            (set! x (rand-update x))
+            x)))
+```
+
+可以看到我们使用了赋值语句`(set! x (rand-update x))`，x记录了每一次调用的局部状态，供下一次使用。这里，我们可以看到具有面向对象的想法，把状态封装在内部，实现了模块化的设计。
+
+我们实现一个用随机数实现蒙特卡罗模拟：从一个大集合里随机选择样本，对试验的统计估计的基础上做出推断。6/(pi)^2是随机选择两个整数之间没有公因子（最大公因子GCD是1）的概率，利用这个特性来估计pi的值。
+
+### 允许赋值
+
+``` scheme
+(define (estimate-pi trials)
+    (sqrt (/ 6 (monte-carlo trials cesaro-test))))
+
+(define (cesaro-test)
+    (= (gcd (rand) (rand)) 1))
+
+(define (monte-carlo trials experiment)
+    (define (iter trials-remaining trials-passed)
+        (cont ((= trials-remaining 0)
+                (/ trials-passed trials))
+            ((experiment)
+                (iter (- trials-remaining 1) (+ trials-passed 1)))
+            (else (iter (- trials-remaining 1) trials-passed))))
+    (iter trials 0))
+
+```
+
+### 不允许赋值
+
+``` scheme
+(define (estimate-pi trials)
+    (sqrt (/ 6 (random-gcd-test trials random-init))))
+
+(define (random-gcd-test trials initial-x)
+    (define (iter trials-remaining trials-passed x)
+        (let ((x1 (rand-update x)))
+            (let ((x2 (rand-update x1)))
+                (cont ((= trials-remaining 0)
+                        (/ trials-passed trials))
+                    ((= (gcd x1 x2) 1)
+                        (iter (- trials-remaining 1)
+                            (+ trials-passed 1)
+                            x2))
+                    (else
+                        (iter (- trials-remaining 1)
+                            trials-passed
+                            x2))))))
+    (iter trials 0 initial-x))
+
+```
+
+在不允许赋值的情况下，random-gcd-test必须显示地操作随机数x1和x2，并把x2传递给rand-update作为新的输入。随机数的显式处理(rand-update)，和累积结果的检查(trials-remianing等代码)，交织在一起。同时导致了，上层调用estimate-pi也需要提供随机数的初始值，无法将蒙特卡罗方法独立出来。
+
+蒙特卡罗方法的例子，显示了一种普遍的现象：假如一个复杂过程，包含A、B、C、D...，从A的视角看，其他部分B、C、D...，在随时间不断变化，但他们隐藏了自己随时间变化的状态。用局部状态去模拟系统状态，用变量的赋值如模拟状态变化。
+
+与所有状态必须显式的操作和传递参数的不能赋值的方法相比，使用赋值和将状态隐藏在局部变量中的方法，设计构造的系统更加模块化。不用使用任何赋值的程序设计，称之为函数式程序设计，可以使用代换模型简洁的解释。代换模型中，符号（变量）只不过是作为值得名称。同一个东西可以互换，替换不会改变表达式的值，称之为这个语言有引用透明性。
+
+而引入赋值之后，符号不能再作为值的名称。变量索引了一个环境中可以保存值的位置，存储在那里的值可以改变。使用赋值的程序设计，称之为命令式程序设计。会导致计算模型复杂，同时会导致一些不容易出现函数式编程中的错误。赋值与时间顺序显式的相关，那么一个变量放在另一个之前，还是之后，就很不易处理。
+
+### 流
+
+流优点在于，能忽略程序中各个时间的实际发生顺序，这是赋值无法做到的事情，赋值就需要考虑时间和变化。
+
+#### 流的实现
+
+流有构造函数`cons-stream`，和两个选择函数`stream-car`和`stream-cdr`，满足两个条件：
+
+- (stream-car (cons-stream x y)) = x
+- (stream-cdr (cons-stream x y)) = y
+
+流基于delay的特殊形式实现，`(delay <exp>)`的求值将不对表达式`<exp>`求值，而是返回一个延时对象，可以看做是未来的某个时间求值`<exp>`的许诺。与之对应，有force，迫使delay完成所许诺的求值。(延时想起了，类似的定义，jQuery中Ajax的deferred)
+
+使用序对来构造流，不过cdr部分放的并非是流的后面的部分，而是存放的可以计算其的许诺。
+
+`(cons-stream <a> <b>)` 等价于 `(cons <a> (delay <b>))`。
+
+delay和force怎么实现呢？delay可以看做一个函数，执行的时候才求值，而force则只需要执行这个函数即可。
+
+cons-stream则可以实现为：
+
+``` scheme
+(define (cons-stream exp delay)
+    (cons exp (lamdba () (delay))))
+
+; 定义正整数无穷流
+(define (integers-startring-from n)
+    (const-stream n (integers-startring-from (+ n 1))))
+(define integers-stream (integers-startring-from 1))
+```
+
+`(delay <exp>)`其实是语法糖`(lambda () <exp>)`。而force不过是无参的调用过程：
+
+``` scheme
+(define (force delayed-object)
+    (delayed-object))
+```
+
+
+``` scheme
+
+(define (stream-car stream) (car stream))
+(define (stream-cdr stream) (force (cdr stream)))
+
+; map
+(define (stream-map proc s)
+    (if (stream-null? s)
+        the-empty-stream
+        (cons-stream (proc (stream-car s))
+            (stream-map proc (stream-cdr s)))))
+
+```
+
+#### monte-carlo流的实现
+
+``` scheme
+; 随机数流
+; rand-update的定义见上文
+(define random-numbers
+    (cons-stream random-init
+        (stream-map rand-update random-numbers)))
+
+; cesaro实验流
+(define cesaro-stream
+    (map-successive-pairs (lambda (r1 r2) (= (gcd r1 r2) 1))
+        random-numbers))
+
+(define (map-successive-pairs f s )
+    (cons-stream
+        (f (stream-car s) (stream-car (stream-cdr s)))
+        (map-successive-pairs f (stream-cdr s))))
+
+; cesaro-stream溃入monte-carlo过程，生成一个可能估计值的流，再变换，得到估计pi值的流。无需参数告知要实验多少次
+(define (monte-carlo experiment-stream passed failed)
+    (define (next passed failed)
+        (cons-stream
+            (/ passed (+ passed failed))
+            (monte-carlo
+                (stream-car experiment-stream) passed failed)))
+    (if (stream-car experiment-stream)
+        (next (+ passed 1) failed)
+        (next passed (+ failed 1))))
+
+(define pi
+    (steam-map (lambda (p) (sqrt (/ 6 p)))
+    (monte-carlo cesaro-stream 0 0)))
+```
+
+通过流，也构造了一个模块化的monte-carlo过程，无赋值，无状态。
+
+#### 流是Monad吗？
+
+unit是什么？
+bind是怎么实现？
+
 
 ## 范畴论
 
@@ -505,6 +754,11 @@ SICP
 
 ## change log
 
+- 2019/4/5 重读SICP第3章
 - 2019/4/6 收集资料
 - 2019/4/7 半夜，范畴论wiki整理完毕
-- 2019/4/7 早晨，证明Promise是Monad，以及Promise构造完毕
+- 2019/4/7 1点多，证明Promise是Monad
+- 2019/4/7 深夜，思考Promise的工程化的逐步实现，导致失眠，我是一年失眠不会超过两次的人
+- 2019/4/7 Promise构造，初步完毕。代码是当数学符号在写，为验证，以后要验证一下
+- 2019/4/7 下午，摘录SICP上讨论流的实现，例子是蒙特卡罗求pi
+- 2019/4/7 晚上，整理React Hooks资料
