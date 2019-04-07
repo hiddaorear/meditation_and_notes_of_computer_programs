@@ -705,19 +705,19 @@ bind是怎么实现？
 ### group/semigroup/monoid的命名
 
 > - 对乘法封闭的集合，就是 magma，汉译「原群」
-- 乘法结合律的原群，就是 semigroup，汉译「半群」
-- 带有单位元的半群，就是 monoid，汉译「幺半群」
-- 带有逆元的幺半群，就是 group 群
+> - 乘法结合律的原群，就是 semigroup，汉译「半群」
+> - 带有单位元的半群，就是 monoid，汉译「幺半群」
+> - 带有逆元的幺半群，就是 group 群
 
 > Mono- 幺 （源于希腊语的词缀）
--id 用于形成名词的后缀，无实义 （同样源于希腊语的后缀）
+> -id 用于形成名词的后缀，无实义 （同样源于希腊语的后缀）
 
 >Group 群 有4个性质 C.A.N.I.
-- C: Close 封闭性
-- A: Associative 连续性
-- N: Neutral (or Identity = Id) 幺元
-- I: Inverse 逆元
-- Semi-Group 半群 只有2个性质: C.A.
+>- C: Close 封闭性
+>- A: Associative 连续性
+>- N: Neutral (or Identity = Id) 幺元
+>- I: Inverse 逆元
+>- Semi-Group 半群 只有2个性质: C.A.
 
 Monoid 么半群 : C.A. + N (= Id) => Mono + Id
 
