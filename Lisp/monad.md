@@ -286,9 +286,9 @@ if (url instanceof Just) {
 
 #### Sophie Alpert，Hooks为了解决三个问题：
 
-> 1. Reusing logic.目前的解决方案是HOCs和Render props，这两种方式会造成Components的不断嵌套，代码很难维护。 Giant components.
-2. react component中的有许多的lifecycle，在不同的lifecycle里面做不同的事情，开发人员需要将注意力分散到不同的lifecycle中去。
-3. Confusing classes. 基于class的component让初学者难以理解，同时runtime优化也很难做到。
+>1. Reusing logic.目前的解决方案是HOCs和Render props，这两种方式会造成Components的不断嵌套，代码很难维护。 Giant components.
+>2. react component中的有许多的lifecycle，在不同的lifecycle里面做不同的事情，开发人员需要将注意力分散到不同的lifecycle中去。
+>3. Confusing classes. 基于class的component让初学者难以理解，同时runtime优化也很难做到。
 
 #### this指针
 
@@ -307,10 +307,10 @@ class中用bind或箭头函数。
 
 ### 抽象理解
 
-- useState(State Monad)
-- useEffect(_->Algebraic Effect) 注入Algebraic Effect。
-Algebraic Effect简单来说是generator without
-yield。直观理解，如果render函数是一个generator，可以适当的时候yield出执行权(useState)，让框架做点事情(如记录state到VDOM)，然后框架再把render需要的数据返回到yield处(如上次的state和setState函数)
+- `useState(State Monad)`
+- `useEffect(_->Algebraic Effect)` 注入Algebraic Effect。
+
+Algebraic Effect简单来说是generator without yield。直观理解，如果render函数是一个generator，可以适当的时候yield出执行权(useState)，让框架做点事情(如记录state到VDOM)，然后框架再把render需要的数据返回到yield处(如上次的state和setState函数)
 
 ### 直观感受
 
