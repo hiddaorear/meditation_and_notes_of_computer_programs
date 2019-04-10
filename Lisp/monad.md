@@ -744,6 +744,8 @@ Dijkstra语录：
 
 ## 资料
 
+### Monad
+
 SICP
 
 - [函数式语言的宗教](http://www.yinwang.org/blog-cn/2013/03/31/purely-functional)
@@ -755,6 +757,10 @@ SICP
 - [从函数式编程到Promise](https://blog.fundebug.com/2017/06/21/write-monad-in-js/)
 
 - [Monads in JavaScript](https://curiosity-driven.org/monads-in-javascript#)
+
+### 流
+
+- [流，计数与生成函数](http://notebook.xyli.me/SICP/stream-count-and-generating-function/)
 
 ## change log
 
