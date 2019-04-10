@@ -350,7 +350,11 @@ function Counter({initialState}) {
 
 ### 优缺点
 
-## scheme的流和Monad
+## Iterators and Generators(JavaScript)
+
+### Generators and Monad
+
+## scheme的流和Generators
 
 我们设计一个过程rand，每次调用会返回一个随机选出的整数。
 
@@ -762,3 +766,4 @@ SICP
 - 2019/4/7 Promise构造，初步完毕。代码是当数学符号在写，未验证，以后要验证一下
 - 2019/4/7 下午，摘录SICP上讨论流的实现，例子是蒙特卡罗方法求pi
 - 2019/4/7 晚上，整理React Hooks资料
+- 2019/4/11 半夜，整理Generators资料
