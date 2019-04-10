@@ -1,5 +1,10 @@
 # IntelliJ使用
 
+## 常用快捷键
+
+-- 打开Terminal：`Alt+F12`
+
+
 ### 参考链接：
 
 [IntelliJ IDEA 简体中文专题教程](https://github.com/judasn/IntelliJ-IDEA-Tutorial)
