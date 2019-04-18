@@ -40,6 +40,10 @@
 
 - `Command-Shift-v` 剪切或拷贝的代码历史记录中，选择粘贴的内容
 
+### 窗口控制
+
+- `Commonad-1` 左侧project开关
+
 ## 自定义快捷键
 
 ``` vimscript
