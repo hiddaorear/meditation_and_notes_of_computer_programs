@@ -8,13 +8,37 @@
 
 - `shift-F6`rename
 
-
 ## 插件快捷键
+
+### 搜索
+
+- `Command-Shift-F` 全局搜索
+- `Command-Shift-R` 全局替换
+
+### 文件浏览
+
+- `Command-E` 最近浏览的文件。类似于vim的缓冲区
 
 ### AceJump
 
-`Ctrl-;`
+- `Ctrl-;`
 
+### 书签
+
+- `F3` 加书签
+- `Command-Shift-数字` 快速创建数字书签；再次在同一行使用，取消书签
+- `Ctrl-数字` 快速跳转到数字书签
+- `Command-F3` 显示书签
+
+### 查看方法或函数信息
+
+- `Command-p` Parameter info (within method call arguments)
+- 'Command-F7' Find usages(在当前项目中的使用情况，会打开一个使用情况面板)
+- `Command-Alt-F7` Show usages(打开使用情况列表)
+
+### 复制、粘贴
+
+- `Command-Shift-v` 剪切或拷贝的代码历史记录中，选择粘贴的内容
 
 ## 自定义快捷键
 
