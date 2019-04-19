@@ -12,6 +12,7 @@
 
 ### 搜索
 
+- `按两次Shift` 搜索
 - `Command-Shift-F` 全局搜索
 - `Command-Shift-R` 全局替换
 
