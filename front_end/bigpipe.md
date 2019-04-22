@@ -1,4 +1,4 @@
-# Bigpipe
+# Bigipe
 
 ## 原理
 
@@ -36,7 +36,7 @@ HTTP1.1支持分块传输。HTTP的Transfer-Encoding消息头值为chunked。消
   </script>
 </head>
 <body>
-    <div id="moduleA"></div>
+     <div id="moduleA"></div>
     <div id="moduleB"></div>
     <div id="moduleC"></div
 ```
@@ -80,7 +80,7 @@ app.listen(3000);
 
 - 页面不再是一次性输出，而是分片段输出。
 - 同时，即使是分片的输出，也不是每一个片段是一个请求，而是复用一个请求。
--服务端可以是并行异步处理。
+- 服务端可以是并行异步处理。
 
 ## 参考资料
 
