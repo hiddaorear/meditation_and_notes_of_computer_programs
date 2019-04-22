@@ -1,4 +1,4 @@
-# Bigipe
+# BigPipe
 
 ## 原理
 
