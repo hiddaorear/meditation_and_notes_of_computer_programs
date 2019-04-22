@@ -61,12 +61,14 @@ HTML内联框架元素 <iframe> 表示嵌套的浏览上下文，有效地将另
 
 关联很小，不补充。
 
+## 安全
+
+可用通过`X-Frame-Options`控制页面被嵌套的策略
+
 ## Recap
 
-- iFrame对应一个独立的浏览器上下（Browsing Context）
-- 用于支持第三方嵌套页面
-- 可用通过`X-Frame-Options`控制页面被嵌套的策略
-- iFrame页面元素样式相对于Viewport处理
+各大功能，归根结底，是使用了iframe创建了上下文无关的功能，和有src元素支持跨域的请求资源的特性。iframe的技巧，都是利用这个两个特性。
+
 
 ## 参考资料
 
