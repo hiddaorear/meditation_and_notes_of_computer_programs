@@ -17,6 +17,22 @@ Alan J. Perlis
 > - 组合的方法。简单个体构造复合元素
 > - 抽象的方法。通过这个抽象的方法，为复合对象命名，并将它当做单元去操作
 
+## 文档
+
+### React
+
+- [React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
+
+### IDE
+
+- [IntelliJ](./IDE/IntelliJ.md)
+
+### front_end
+
+- [bigpipe](./front_end/bigpipe.md)
+
+- [iframe](./front_end/iframe.md)
+
 ## todolist
 
 - [monad](./Lisp/monad.md)
