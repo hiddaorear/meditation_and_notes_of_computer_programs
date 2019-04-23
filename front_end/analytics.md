@@ -184,6 +184,8 @@ function c(q) {
 
 # 参考资料
 
+- 《现代前端技术解析》by 张成文
+
 - [网站统计那些事（一）：背景与基础概念](https://afantasy.ninja/2017/05/08/user-tracking-i/)
 
 - [网站统计那些事（二）：统计脚本实现（上） ](https://afantasy.ninja/2017/05/08/user-tracking-ii/)
