@@ -33,6 +33,8 @@ Alan J. Perlis
 
 - [iframe](./front_end/iframe.md)
 
+- [analytics](./front_end/analytics.md)
+
 ## todolist
 
 - [monad](./Lisp/monad.md)
