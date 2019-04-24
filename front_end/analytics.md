@@ -10,6 +10,8 @@
 
 ### 上报的请求
 
+#### 朴素实现
+
 为了避免ajax的不便之处，一般用`Image src`的方式上报。代码例子：
 
 ``` javascript
@@ -24,7 +26,9 @@ function log(logType, data) {
     var queryString = queryArr.join('&');
     var uniqueId = "log_"+ (new Date()).getTime();
     var image = new Image(1,1);
+
     window[uniqueId] = image;   // use global pointer to prevent unexpected GC
+
     // 如果使用服务器的域名地址上报失败，则随机使用一个备用 IP 列表中的服务器进行上报
     image.onerror = function() {
       var ip = IP_LIST[Math.floor(Math.random() * IP_LIST.length)];
@@ -33,12 +37,41 @@ function log(logType, data) {
         window[uniqueId] = null;  // release global pointer
       };
     };
+
     image.onload = function() {
       window[uniqueId] = null; // release global pointer
     };
+
     image.src = REPORT_URL + '?act=' + logType + '&' + queryString;
 }
 ```
+
+以上基本实现存在的问题：调用之后立即执行上报逻辑，可能影响页面性能
+
+#### 改进
+
+``` javascript
+
+// by alsotang, form github alsotang/ric.js
+// 有修改
+let idleCallback = ( heavyWork, isDone, afterDone, timeout ) => {
+
+    if (isDone && isDone()) {
+       afterDone && afterDone();
+       return ;
+    }
+
+    requestIdleCallback((deadline) => {
+        while((deadline.timeRemaining() > 0 && (isDone && !isDone())) || deadline.didTimeout) {
+            heavyWork();
+        }
+    }, {timeout});
+
+    idleCallback( heavyWork, isDone, afterDone, timeout );
+};
+
+idleCallback(log('test', {test: 123}), null, null, 1000);
+
 
 ## 关键指标
 
@@ -136,7 +169,7 @@ PC版网站抽样(单位KB)
 |站点  | JS | CSS |
 | :------| :------: |:------: |
 | 淘宝 | 26.0  |0|
-|京东  | 20.5  |2.9|
+| 京东  | 20.5  |2.9|
 | 头条(https://www.toutiao.com/) | 32.5  |32|
 | 头条广告投放平台(https://ad.toutiao.com/promotion/) |36.8  |55.4|
 | 腾讯课堂 |34.1  |35|
