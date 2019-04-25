@@ -68,6 +68,46 @@ clock:      |----------|----------|
 
 #### 任务队列问题
 
+JavaScript是单线程语言，一次只能执行一个任务。如果有有多个任务，则需要排队处理。同步任务，则一次串行执行。异步任务，则进入task queue任务队列，主线程空了，则读取任务队列，执行之。
+
+队列种类：
+
+- `macro-task`：普通JS代码，`setTimeout, setInerval, setImmediate`，UI渲染，I/O
+- `micro-task`：原生Promise，`Object.observe`，`MutationObserver`， `process.nextTick`
+
+执行顺序：
+
+普通JS代码 => `micro-task` => `macro-task`。
+
+1. 从普通JS代码开始执行，执行完主线上JS之后
+2. 查看`micro-task`队列中任务，如果有，则依次执行，直到执行完毕。如果无，则执行3
+3. 之后才去查看`macro-task`，每次执行`macro-task`，会查看`micro-task`，如果有，则执行2
+
+代码例子：
+
+``` JavaScript
+console.log('script start');
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+
+// script start
+// script end
+// promise1
+// promise2
+// setTimeout
+
+```
+
 
 ## requestIdleCallback
 
@@ -264,6 +304,8 @@ danabramov:
 - [Is there plan to implement the react-core in C or other native language ?](https://news.ycombinator.com/item?id=16494314)
 
 - [关于动画，你需要知道的](https://www.h5jun.com/post/animations-you-should-know.html)
+
+- [Tasks, microtasks, queues and schedules](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
 
 
 ## change log
