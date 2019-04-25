@@ -108,6 +108,97 @@ class nonEssentialWork {
 
 ## requestAnimationFrame
 
+实现动画的时候，requestAnimationFrame替代了setTimeout和setInterval等定时器，主要解决了渲染时机问题（见上文）。
+
+### 如何实现动画
+
+例子来源：十年踪迹
+
+``` html
+
+<style>
+  #block{
+    position:absolute;
+    left: 200px;
+    top: 200px;
+    width: 100px;
+    height: 100px;
+    background: #0c8;
+    line-height: 100px;
+    text-align: center;
+  }
+</style>
+<div id="block">click me</div>
+```
+
+``` JavaScript
+var deg = 0;
+block.addEventListener('click', function(){
+    requestAnimationFrame(function change(){
+        block.style.transform = 'rotate(' + (deg++) +'deg)';
+        requestAnimationFrame(change);
+    });
+});
+
+```
+
+#### 把时间作为一个线性的增量
+
+时间均匀线性递增，以此来影响动画维度值的变化，这里是deg的线性递增。从物理角度来看，这里定义了一个速度，并对速度求积分，得到了位移。
+
+注：无论是setTimeout还是requestAnimationFrame都无法做到以固定的时间间隔执行动画，受浏览器时钟和显示器渲染刷新频率影响，具体原因见上文。这里为了阐述问题，假设API有此能力，实际上无此能力，对此种实现影响更糟糕。
+
+会产生两个问题：
+
+- 变速运动不易处理，要找到适当的求积分的速度
+- 中间被其他耗时任务阻塞，导致动画变慢
+
+``` JavaScript
+var deg = 0;
+block.addEventListener("click", function(){
+  setInterval(function(){
+    var i = 0;
+    var t = Date.now();
+    while(++i < 200000000); //模拟耗时操作
+    console.log(Date.now() - t);
+  }, 100);
+
+  var self = this;
+  requestAnimationFrame(function change(){
+    self.style.transform = "rotate(" + (deg++) +"deg)";
+    requestAnimationFrame(change);
+  });
+});
+
+```
+
+#### 位移是时间的函数`s=f(t)`
+
+使用流逝的时间点来处理位移，而非假设的均匀线性的时间增量。这样阻塞之后，动画不变慢，而是掉帧。对变速运动也易处理，使用物理学公式即可，如匀加速运动`s = v0*t + (1/2)*a*t^2`
+
+``` JavaScript
+
+block.addEventListener("click", function(){
+  var self = this, startTime = Date.now(),
+      duration = 1000;
+  requestAnimationFrame(function change(){
+    var p = (Date.now() - startTime) / duration;
+    self.style.transform = "rotate(" + (360 * p) +"deg)";
+    requestAnimationFrame(change);
+  });
+});
+
+```
+
+对比利用时间点相减和以时间增量来实现动画
+
+|功能| 时间 | 增量 |
+| :------|:------: |:------: |
+|时间控制|√|X|
+|不延迟|√|X|
+|不掉帧|X|√|
+
+
 ## React Fiber and React Scheduler
 
 Fiber是一种调度算法(Fiber reconciler)，使用requestIdleCallback实现，React用requestAnimationFrame模拟实现。解决无多线程操作带来的问题。
@@ -172,6 +263,7 @@ danabramov:
 
 - [Is there plan to implement the react-core in C or other native language ?](https://news.ycombinator.com/item?id=16494314)
 
+- [关于动画，你需要知道的](https://www.h5jun.com/post/animations-you-should-know.html)
 
 
 ## change log
