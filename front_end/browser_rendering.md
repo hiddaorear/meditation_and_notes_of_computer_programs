@@ -39,7 +39,7 @@ animation: ------|-------------------|--------
 
 ```
 
-animation的frame(`<15.6*2ms`)，第一个、第二个时钟周期都没来及渲染，导致动画看起来不流畅。这种情况，一般来说是重绘和重排等大量耗时操作导致。requestIdleCallback可以缓解这个问题，其功能是选择浏览器的idle时间，来执行任务。也可以利用这个API实现，把一个大任务，分片执行，如React Fiber和React Scheduler。
+animation的frame(`<15.6*2ms`)，第一个、第二个时钟周期都没来及渲染，导致动画看起来不流畅。这种情况，一般来说是重绘和重排等大量耗时操作导致。低优先级的任务，requestIdleCallback可以缓解这个问题，其功能是选择浏览器的idle时间，来执行任务。也可以利用这个API实现，把一个大任务，分片执行，如React Fiber和React Scheduler。
 
 
 ### setTimeout和setInterval的问题
@@ -71,10 +71,78 @@ clock:      |----------|----------|
 
 ## requestIdleCallback
 
+``` JavaScript
+
+class nonEssentialWork {
+    constructor(task, timeout) {
+        this.tasks = task || [];
+        this.timeout = timeout || 0;
+    }
+
+    getTasks = () => {
+        return this.tasks;
+    }
+
+    push = (task) => {
+        this.tasks.push(task);
+    }
+
+    clear = () => {
+        this.tasks = [];
+    }
+
+    main = () => {
+        let timeout = this.timeout;
+        requestIdleCallback((deadline) => {
+            while((deadline.timeRemaining() > 0 || deadline.didTimeout) && this.tasks.length > 0) {
+               this.tasks.pop()();
+            }
+            if (this.tasks.length > 0) {
+                requestIdleCallback(this.main, {timeout});
+            }
+        }, {timeout});
+    }
+
+};
+
+```
+
 ## requestAnimationFrame
 
 
+
 ## React Fiber and React Scheduler
+
+Fiber是一种调度算法，使用requestIdleCallback实现，React用requestAnimationFrame模拟实现。解决无多线程操作带来的问题。
+
+DOM的树形结构，以及其包含的大量数据，保证其顺序执行，且不影响主线程的UI渲染。从Root开始，遍历tree结构，到达叶子节点，则回到父节点，以链表的形式链接起来(或者队列？)，如下图：
+
+![Fiber](./Fiber.png)
+
+优点：
+
+- 不用递归处理DOM树，循环即可。相比递归的栈，只需多了额外内存保存信息
+- 有了此层的抽象，可以将Diff任务以及创建DOM的任务，分片执行之。异步渲染，虽然持续时间长，但zhzhzhzh只有最后变更的时候，一次性插入DOM
+
+本质上React的Fiber是将任务分片为小任务，在16ms中的渲染的空闲时间执行。
+
+### 与协程的Fiber有差异
+
+有栈协程的Fiber。协程的任务一直会占用线程，直到用户返回。在事件循环和异步IO模型中，协程性能较好，且可以使用Future模式（Promise），把异步编程带来的问题消除。
+
+浏览器的无栈协程：generator, Promise和async+await
+
+### webAssembly与Fiber
+
+来自Hacker News的讨论：
+
+crudbug:
+> Is there plan to implement the react-core in C or other native language ?
+I can see that being compiled to webassembly for browsers and react-native can have multiple language support ?
+
+danabramov:
+> think my talk paints a relatively convincing picture why DOM nodes aren’t a sufficient primitive if you care about the features I described, as you’d need something like React to orchestrate those updates
+>
 
 
 ## 参考资料
@@ -96,6 +164,9 @@ clock:      |----------|----------|
 - [浏览器的渲染原理简介](https://coolshell.cn/articles/9666.html)
 
 - [深入剖析 React Concurrent](https://zhuanlan.zhihu.com/p/60307571)
+
+- [Is there plan to implement the react-core in C or other native language ?](https://news.ycombinator.com/item?id=16494314)
+
 
 
 ## change log
