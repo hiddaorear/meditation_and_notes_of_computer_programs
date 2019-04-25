@@ -71,7 +71,7 @@ let idleCallback = ( heavyWork, isDone, afterDone, timeout ) => {
 };
 
 idleCallback(log('test', {test: 123}), null, null, 1000);
-
+```
 
 ## 关键指标
 
