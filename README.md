@@ -35,6 +35,8 @@ Alan J. Perlis
 
 - [analytics](./front_end/analytics.md)
 
+- [browser rendering](./front_end/browser_rendering.md)
+
 ## todolist
 
 - [monad](./Lisp/monad.md)
