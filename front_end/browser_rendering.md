@@ -87,7 +87,7 @@ class nonEssentialWork {
         this.tasks.push(task);
     }
 
-    clear = () => {
+    clean = () => {
         this.tasks = [];
     }
 
@@ -102,29 +102,28 @@ class nonEssentialWork {
             }
         }, {timeout});
     }
-
 };
 
 ```
 
 ## requestAnimationFrame
 
-
-
 ## React Fiber and React Scheduler
 
-Fiber是一种调度算法，使用requestIdleCallback实现，React用requestAnimationFrame模拟实现。解决无多线程操作带来的问题。
+Fiber是一种调度算法(Fiber reconciler)，使用requestIdleCallback实现，React用requestAnimationFrame模拟实现。解决无多线程操作带来的问题。
 
-DOM的树形结构，以及其包含的大量数据，保证其顺序执行，且不影响主线程的UI渲染。从Root开始，遍历tree结构，到达叶子节点，则回到父节点，以链表的形式链接起来(或者队列？)，如下图：
+DOM的树形结构，以及其包含的大量数据，保证其顺序执行，且不影响主线程的UI渲染。从Root开始，遍历tree结构，到达叶子节点，则回到父节点，以链表的形式链接起来，如下图：
 
 ![Fiber](./Fiber.png)
 
 优点：
 
 - 不用递归处理DOM树，循环即可。相比递归的栈，只需多了额外内存保存信息
-- 有了此层的抽象，可以将Diff任务以及创建DOM的任务，分片执行之。异步渲染，虽然持续时间长，但zhzhzhzh只有最后变更的时候，一次性插入DOM
+- 有了此层的抽象，可以将Diff任务以及创建DOM的任务，分片执行之。异步渲染，虽然持续时间长，但只有最后变更的时候，一次性插入DOM
 
-本质上React的Fiber是将任务分片为小任务，在16ms中的渲染的空闲时间执行。
+JavaScript与UI渲染互斥，执行JavaScript则阻塞了UI渲染。如果JavaScript运行时间长，则会明显阻塞渲染，导致掉帧。
+
+本质上React的Fiber是将任务分片为小任务，在16ms中的渲染的空闲时间执行。从而避免掉帧的问题。
 
 ### 与协程的Fiber有差异
 
@@ -148,6 +147,12 @@ danabramov:
 ## 参考资料
 
 - [Javascript 高性能动画与页面渲染](https://www.infoq.cn/article/javascript-high-performance-animation-and-page-rendering)
+
+- [完全理解React Fiber](http://www.ayqy.net/blog/dive-into-react-fiber/)
+
+- [Inside Fiber: in-depth overview of the new reconciliation algorithm in React](https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e)
+
+- [React16源码之React Fiber架构](https://github.com/HuJiaoHJ/blog/issues/7)
 
 - [从 event loop 规范探究 javaScript 异步及浏览器更新渲染时机](https://juejin.im/entry/59082301a22b9d0065f1a186)
 
