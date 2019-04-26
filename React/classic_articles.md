@@ -4,6 +4,8 @@
 
 - [译:为什么说Suspense是一种巨大的突破？](https://zhuanlan.zhihu.com/p/60218372)
 
+- [BOT Man | John Lee](https://bot-man-jl.github.io/articles/)
+
 
 ## change log
 
