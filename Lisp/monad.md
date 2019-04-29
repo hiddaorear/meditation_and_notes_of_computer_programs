@@ -37,6 +37,108 @@ IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”�
 
 回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
 
+## Monad典型种类与JavaScript实现
+
+### 最简单的Monad: Identity Monad
+
+仅仅是wrap一个值。
+
+``` JavaScript
+function Identity(value) {
+    this.value = value;
+}
+
+Identity.prototype.bind = function (transform) { return transform(this.value)};
+new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
+```
+
+### Maybe Monad
+
+除了像Identity Monad存储值，还可以表征缺少值。如果计算遇到Nothing，则随后的计算停止，直接返回Nothing。
+
+``` JavaScript
+
+function Just(value) {
+    this.value = value;
+}
+
+Just.prototype.bind = function (transform) { return transform(this.value)};
+
+let Nothing = {
+    bind: function() {
+        return this;
+    }
+};
+
+let result = new Just(5).bind(value =>
+                 Nothing.bind(value2 =>
+                      new Just(value + value2)));
+
+```
+
+#### 可以用于避免因为null而产生的错误：
+
+``` JavaScript
+
+function getUser() {
+    return {
+        getAvatar: function() {
+            return null; // no avatar
+        }
+    };
+}
+
+```
+1. 捕获异常
+
+``` JavaScript
+try {
+    let url = getUser().getAvatar().url;
+    console.log(url); // this never happens
+} catch (e) {
+    console.log('Error: ' + e);
+}
+
+```
+
+2. 或者做null检测
+
+``` JavaScript
+let user = getUser();
+if (user !== null) {
+    let avatar = user.getAvatar();
+    if (avatar !== null) {
+        url = avatar.url;
+    }
+}
+
+```
+3. 使用Maybe Monad
+
+``` JavaScript
+function getUser(){
+    return new Just({
+        getAvatar: function(avatar) {
+            if (avatar) { // has avatar?
+                return new Just(avatar);
+            } else {
+                return Nothing; // no avatar
+            }
+        }
+    })};
+
+let url = getUser()
+        .bind(user => user.getAvatar())
+        .bind(avatar => avatar.url);
+
+if (url instanceof Just) {
+    console.log('URL has value: ' + url.value);
+} else {
+    console.log('URL is empty.');
+}
+
+```
+
 ## Promise(Continuation Monad)
 
 ### 初略验证Promise是Monad
@@ -185,113 +287,14 @@ async('urlString')
     .done(result => console.log(reslut));
 ```
 
-## Monad典型种类与JavaScript实现
-
-### 最简单的Monad: Identity Monad
-
-仅仅是wrap一个值。
-
-``` JavaScript
-function Identity(value) {
-    this.value = value;
-}
-
-Identity.prototype.bind = function (transform) { return transform(this.value)};
-new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
-```
-
-### Maybe Monad
-
-除了像Identity Monad存储值，还可以表征缺少值。如果计算遇到Nothing，则随后的计算停止，直接返回Nothing。
-
-``` JavaScript
-
-function Just(value) {
-    this.value = value;
-}
-
-Just.prototype.bind = function (transform) { return transform(this.value)};
-
-let Nothing = {
-    bind: function() {
-        return this;
-    }
-};
-
-let result = new Just(5).bind(value =>
-                 Nothing.bind(value2 =>
-                      new Just(value + value2)));
-
-```
-
-#### 可以用于避免因为null而产生的错误：
-
-``` JavaScript
-
-function getUser() {
-    return {
-        getAvatar: function() {
-            return null; // no avatar
-        }
-    };
-}
-
-```
-1. 捕获异常
-
-``` JavaScript
-try {
-    let url = getUser().getAvatar().url;
-    console.log(url); // this never happens
-} catch (e) {
-    console.log('Error: ' + e);
-}
-
-```
-
-2. 或者做null检测
-
-``` JavaScript
-let user = getUser();
-if (user !== null) {
-    let avatar = user.getAvatar();
-    if (avatar !== null) {
-        url = avatar.url;
-    }
-}
-
-```
-3. 使用Maybe Monad
-
-``` JavaScript
-function getUser(){
-    return new Just({
-        getAvatar: function(avatar) {
-            if (avatar) { // has avatar?
-                return new Just(avatar);
-            } else {
-                return Nothing; // no avatar
-            }
-        }
-    })};
-
-let url = getUser()
-        .bind(user => user.getAvatar())
-        .bind(avatar => avatar.url);
-
-if (url instanceof Just) {
-    console.log('URL has value: ' + url.value);
-} else {
-    console.log('URL is empty.');
-}
-
-```
 
 ## React Hooks
 
+pure functon 中利用 effects 去管理状态。
+
 ### 问题
 
-#### Sophie Alpert，Hooks为了解决三个问题：
+#### Hooks为了解决三个问题(Sophie Alpert)：
 
 >1. Reusing logic.目前的解决方案是HOCs和Render props，这两种方式会造成Components的不断嵌套，代码很难维护。 Giant components.
 >2. react component中的有许多的lifecycle，在不同的lifecycle里面做不同的事情，开发人员需要将注意力分散到不同的lifecycle中去。
@@ -303,8 +306,7 @@ class中用bind或箭头函数。
 
 #### 复用
 
-复用业务代码很麻烦。拆组件，然后要么render props，或render childrend，要么HoC，最不济props。修改组件就很麻烦。如果设计得要更灵活，就导致props或组件增加很多
-
+复用业务代码很麻烦。拆组件，然后要么render props，或render children，要么HoC，最不济props。修改组件就很麻烦。如果设计得要更灵活，就导致props或组件增加很多
 
 写法上组件有wrapper hell问题，嵌套太深，性能也不好。
 
