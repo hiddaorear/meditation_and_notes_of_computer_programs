@@ -4,15 +4,13 @@
 
 ## 直观感觉
 
-Monad是一个抽象的数学概念，不容易给出直观的准确描述。类似的有量子力学里的波粒二象性和自旋向上、自旋向下，本质上要通过数学去感知，很难找到既是粒子也是波的可感知的物品，也很难找到一个在三维空间中只有两个方向的可感知的物品。读了很多人对Monad的讲述，我认为，王垠对Lisp的评判的文章《函数式语言的宗教》中的例子：用随机数生成函数，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的”不纯函数。恰到好处地描述了Monad在编程的本质。
+Monad是一个抽象的数学概念，不容易给出直观的准确描述。类似的有量子力学里的波粒二象性，本质上要通过数学去感知，很难找到既是粒子也是波的可感知的物品。王垠对Lisp的评判的文章《函数式语言的宗教》中的例子：用随机数生成函数，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的“不纯函数”。很形象地描述了Monad在编程的本质。
 
 > 为了达到“纯函数”的目标，我们需要做很多“管道工”的工作，这增加了程序的复杂性和工作量。如果我们可以把种子存放在一个全局变量里，到需要的时候才去取，那就根本不需要把它传来传去的。除 random() 之外的代码，都不需要知道种子的存在。
 
 > 为了减轻视觉负担和维护这些进进出出的“状态”，Haskell 引入了一种叫 monad 的概念。它的本质是使用类型系统的“重载”（overloading），把这些多出来的参数和返回值，掩盖在类型里面。
 
-从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看作有状态的函数，如State Monad。Monad不仅仅是用来处理副作用，典型的处理副作用的Monad：IO Monad.
-
-从王垠的例子：
+王垠的例子：
 
 ``` c
 int random()
@@ -25,12 +23,16 @@ int random()
 
 在Haskell中`（旧种子）---> （新随机数，新种子）`。由于Haskell中不允许赋值语句`seed = next_random(seed)`，想办法把种子`seed`放在函数的参数里，这样来接受输入。进一步，Monad在这个情形中，可以认为是用函数的参数实现了赋值语句的能力，赋值被Monad隐藏了。
 
+从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看作有状态的函数，如State Monad。Monad不仅仅是用来处理副作用，典型的处理副作用的Monad：IO Monad.
 
 但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
+
+## todo
 
 编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。
 IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”好莱坞原则"，据说是好莱坞经纪人的口头禅。 IoC在编程中的典型例子：回调函数。`sync(param,cb)`，`sync`执行结束，才执行`cb`。从写法上看，似乎sync和cb是并行执行的。
 
+## todo
 综上，Monad的效果：赋值表面上是看不见的，顺序计算表面上是并行的。
 
 回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
@@ -42,15 +44,15 @@ IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”�
 Promise即Cont Monad处理异步很有用。
 
 unit funciton，warp数据返回Promise：`Promise.resolve(value)`
-bind funciton，变换数据并返回Promise： `Promise.prototype.then(onFullfill: value => Promise)`
+bind funciton，变换数据并返回Promise： `Promise.prototype.then(value => Promise)`
 
 证明单位元：e + a = a
 
 ``` JavaScript
-Promise.resolve(Promise.resolve(3)).then(result => console.log(result));
+Promise.resolve(3).then(result => console.log(result));
 // 3
 
-Promise.resolve(3).then(result => console.log(result));
+Promise.resolve(Promise.resolve(3)).then(result => console.log(result));
 // 3
 ```
 
@@ -145,7 +147,7 @@ composeCPS(async, async)(urlString)
 a. 组合对象从函数，修改为doneObj
 
 ``` JavaScript
-const createDoneObj = done  => {{done}};
+const createDoneObj = done  => ({done});
 
 const async = url => {
     return createDoneObj(cb => ajax(url, cb)) ;
@@ -194,7 +196,7 @@ function Identity(value) {
     this.value = value;
 }
 
-Identity.prototype.bind = funciton (transform) { return transform(this.value)};
+Identity.prototype.bind = function (transform) { return transform(this.value)};
 new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
 ```
 
@@ -222,60 +224,65 @@ let result = new Just(5).bind(value =>
 
 ```
 
-可以用于因为null而产生的错误：
+#### 可以用于避免因为null而产生的错误：
 
 ``` JavaScript
 
 function getUser() {
     return {
         getAvatar: function() {
-            return Nothing; // no avatar
+            return null; // no avatar
         }
     };
 }
 
-// 捕获异常
+```
+1. 捕获异常
+
+``` JavaScript
 try {
-    var url = getUser().getAvatar().url;
-    print(url); // this never happens
+    let url = getUser().getAvatar().url;
+    console.log(url); // this never happens
 } catch (e) {
-    print('Error: ' + e);
+    console.log('Error: ' + e);
 }
 
-// 或者做null检测
-var user = getUser();
+```
+
+2. 或者做null检测
+
+``` JavaScript
+let user = getUser();
 if (user !== null) {
-    var avatar = user.getAvatar();
+    let avatar = user.getAvatar();
     if (avatar !== null) {
         url = avatar.url;
     }
 }
 
-// 使用Maybe Monad
+```
+3. 使用Maybe Monad
 
+``` JavaScript
 function getUser(){
     return new Just({
-        getAvatar: function() {
-            if (hasAvatar) {
+        getAvatar: function(avatar) {
+            if (avatar) { // has avatar?
                 return new Just(avatar);
             } else {
-                return null; // no avatar
+                return Nothing; // no avatar
             }
         }
-    });
+    })};
 
-url = getUser()
+let url = getUser()
         .bind(user => user.getAvatar())
         .bind(avatar => avatar.url);
-}
-
-// 这样写，似乎会导致一个麻烦，不知道哪一步产生了null值。
-// 这个写法本质上，消除了赋值语句，而正是赋值语句报错或判空，才知道是哪一步有问题。
 
 if (url instanceof Just) {
-    print('URL has value: ' + url.value);
+    console.log('URL has value: ' + url.value);
 } else {
-    print('URL is empty.');
+    console.log('URL is empty.');
 }
 
 ```
@@ -572,3 +579,4 @@ SICP
 - 2019/4/7 晚上，整理React Hooks资料
 - 2019/4/11 半夜，整理Generators资料
 - 2019/4/11 上午，移除范畴论，新建数学文档
+- 2019/4/29 上午，修改代码，以及语言组织
