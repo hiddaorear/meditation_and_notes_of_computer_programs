@@ -21,6 +21,8 @@ Alan J. Perlis
 
 ### Lisp
 
+- [Algebraic Effects](./Lisp/Algebraic_Effects.md)
+
 - [monad](./Lisp/monad.md)
 
 - [comonad](./Lisp/comonad.md)
