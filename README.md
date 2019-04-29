@@ -19,7 +19,16 @@ Alan J. Perlis
 
 ## 文档
 
+### Lisp
+
+- [monad](./Lisp/monad.md)
+
+- [comonad](./Lisp/comonad.md)
+
+
 ### React
+
+- [Hooks](./React/Hooks.md)
 
 - [React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
 
@@ -37,19 +46,16 @@ Alan J. Perlis
 
 - [browser rendering](./front_end/browser_rendering.md)
 
+
+
 ## todolist
 
-- [monad](./Lisp/monad.md)
-
-- [comonad](./Lisp/comonad.md)
 
 - [mathematics](./Lisp/mathematics.md)
 
 - [Gaussian Blur](./mathematics/Gaussian_Blur.md)
 
 - [cache](./front_end/cache/cache_api.md)
-
-- 思考React的Hooks
 
 - 前端cache
 
@@ -58,3 +64,5 @@ Alan J. Perlis
 ## change log
 
 - 2019/4/21 新增todolist，尽量保持关注的连续性，不可东一榔头，西一棒槌
+
+- 2019/4/29 更细文章列表
