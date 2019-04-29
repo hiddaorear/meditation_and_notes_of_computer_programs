@@ -6,6 +6,10 @@
 
 - [BOT Man | John Lee](https://bot-man-jl.github.io/articles/)
 
+- [React - Basic Theoretical Concepts](https://github.com/reactjs/react-basic)
+
+- [React 设计思想](https://github.com/react-guide/react-basic)
+
 
 ## change log
 
