@@ -201,3 +201,4 @@ export function useAsyncData(value, initData) {
 
 - 2019/4/7 修订，备注Hooks资料在Lisp的Monad中
 - 2019/4/10 修订，补充实战方面的资料
+- 2019/4/29 补充useReducer, useState, useEffect, Custom的例子
