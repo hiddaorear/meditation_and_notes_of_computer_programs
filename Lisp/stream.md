@@ -2,6 +2,24 @@
 
 流优点在于，能忽略程序中各个时间的实际发生顺序，这是赋值无法做到的事情，赋值就需要考虑时间和变化。
 
+## Iterators and Generators(JavaScript)
+
+## Generators and Monad
+
+## scheme的流和Generators
+
+我们设计一个过程rand，每次调用会返回一个随机选出的整数。
+
+假定我们有一个计算函数rand-update，同一个输入，会产生同一个输出。这个函数的性质是，如果从一个给定的数X1开始，执行下面的操作：
+- x2 = (rand-update x1)
+- x3 = (rand-update x2)
+得到的序列x1,x2,x3,...将具有我们所希望的性质。
+
+如果随机是序列中每一个数与前一个数无关，那么rand-update生成的数列肯定不是随机的。真正的随机序列与伪随机序列的关系很复杂。
+
+## 赋值和局部状态
+
+
 ## 流的实现
 
 流有构造函数`cons-stream`，和两个选择函数`stream-car`和`stream-cdr`，满足两个条件：

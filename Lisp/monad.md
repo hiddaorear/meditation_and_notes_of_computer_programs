@@ -355,13 +355,8 @@ function Counter({initialState}) {
 }
 ```
 
-### 优缺点
 
-## Iterators and Generators(JavaScript)
-
-### Generators and Monad
-
-## scheme的流和Generators
+## 赋值和局部状态
 
 我们设计一个过程rand，每次调用会返回一个随机选出的整数。
 
@@ -372,7 +367,6 @@ function Counter({initialState}) {
 
 如果随机是序列中每一个数与前一个数无关，那么rand-update生成的数列肯定不是随机的。真正的随机序列与伪随机序列的关系很复杂。
 
-### 赋值和局部状态
 
 如果允许赋值，我们可以把rand实现为：
 
@@ -389,7 +383,7 @@ function Counter({initialState}) {
 
 我们实现一个用随机数实现蒙特卡罗模拟：从一个大集合里随机选择样本，对试验的统计估计的基础上做出推断。6/(pi)^2是随机选择两个整数之间没有公因子（最大公因子GCD是1）的概率，利用这个特性来估计pi的值。
 
-### 允许赋值
+### 允许赋值的实现
 
 ``` scheme
 (define (estimate-pi trials)
@@ -409,7 +403,7 @@ function Counter({initialState}) {
 
 ```
 
-### 不允许赋值
+### 不允许赋值的实现
 
 ``` scheme
 (define (estimate-pi trials)
@@ -442,9 +436,7 @@ function Counter({initialState}) {
 而引入赋值之后，符号不能再作为值的名称。变量索引了一个环境中可以保存值的位置，存储在那里的值可以改变。使用赋值的程序设计，称之为命令式程序设计。会导致计算模型复杂，同时会导致一些不容易出现函数式编程中的错误。赋值与时间顺序显式的相关，那么一个变量放在另一个之前，还是之后，就很不易处理。
 
 
-#### 赋值（或状态）的必要性
-
-monte-carlo流的实现
+#### 不允许赋值的monte-carlo流的实现
 
 ``` scheme
 ; 随机数流
