@@ -487,6 +487,12 @@ Dijkstra语录：
 
 ## 资料
 
+### todo
+
+- [Monad入门](https://thzt.github.io/2015/03/07/monad/)
+
+### done
+
 - [函数式语言的宗教](http://www.yinwang.org/blog-cn/2013/03/31/purely-functional)
 
 - [A Schemer's Introduction to Monads](http://www.ccs.neu.edu/home/dherman/research/tutorials/monads-for-schemers.txt)
