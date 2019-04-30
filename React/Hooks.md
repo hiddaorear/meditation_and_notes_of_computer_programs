@@ -8,6 +8,14 @@
 
 Hooks是函数组件一类特殊函数（通常以use开头，如useState），使得可以在function component中依旧使用state和life-cycles，以及使用custom hook复用业务逻辑
 
+### 抽象理解
+
+- `useState(State Monad)`
+- `useEffect(_->Algebraic Effect)` 注入Algebraic Effect。
+
+Algebraic Effect简单来说是generator without yield。直观理解，如果render函数是一个generator，可以适当的时候yield出执行权(useState)，让框架做点事情(如记录state到VDOM)，然后框架再把render需要的数据返回到yield处(如上次的state和setState函数)
+
+
 ## 原则
 
 有状态的组件没有渲染，有渲染的组件没有状态
