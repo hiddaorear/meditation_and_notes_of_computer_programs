@@ -278,8 +278,11 @@ I can see that being compiled to webassembly for browsers and react-native can h
 
 danabramov:
 > think my talk paints a relatively convincing picture why DOM nodes aren’t a sufficient primitive if you care about the features I described, as you’d need something like React to orchestrate those updates
->
 
+
+## 渲染优化
+
+### 首屏优化
 
 ## 参考资料
 
@@ -312,6 +315,10 @@ danabramov:
 - [关于动画，你需要知道的](https://www.h5jun.com/post/animations-you-should-know.html)
 
 - [Tasks, microtasks, queues and schedules](https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/)
+
+### 渲染优化
+
+- [构建时预渲染：网页首帧优化实践](https://tech.meituan.com/2018/11/15/first-contentful-paint-practice.html)
 
 
 ## change log
