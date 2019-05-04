@@ -4,15 +4,13 @@
 
 ## 直观感觉
 
-Monad是一个抽象的数学概念，不容易给出直观的准确描述。类似的有量子力学里的波粒二象性和自旋向上、自旋向下，本质上要通过数学去感知，很难找到既是粒子也是波的可感知的物品，也很难找到一个在三维空间中只有两个方向的可感知的物品。读了很多人对Monad的讲述，我认为，王垠对Lisp的评判的文章《函数式语言的宗教》中的例子：用随机数生成函数，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的”不纯函数。恰到好处地描述了Monad在编程的本质。
+Monad是一个抽象的数学概念，不容易给出直观的准确描述。类似的有量子力学里的波粒二象性，本质上要通过数学去感知，很难找到既是粒子也是波的可感知的物品。王垠对Lisp的评判的文章《函数式语言的宗教》中的例子：用随机数生成函数，说明无“状态”或“全局变量”的缺点，不能轻松表达random这样的“不纯函数”。很形象地描述了Monad在编程的本质。
 
 > 为了达到“纯函数”的目标，我们需要做很多“管道工”的工作，这增加了程序的复杂性和工作量。如果我们可以把种子存放在一个全局变量里，到需要的时候才去取，那就根本不需要把它传来传去的。除 random() 之外的代码，都不需要知道种子的存在。
 
 > 为了减轻视觉负担和维护这些进进出出的“状态”，Haskell 引入了一种叫 monad 的概念。它的本质是使用类型系统的“重载”（overloading），把这些多出来的参数和返回值，掩盖在类型里面。
 
-从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看作有状态的函数，如State Monad。Monad不仅仅是用来处理副作用，典型的处理副作用的Monad：IO Monad.
-
-从王垠的例子：
+王垠的例子：
 
 ``` c
 int random()
@@ -25,15 +23,121 @@ int random()
 
 在Haskell中`（旧种子）---> （新随机数，新种子）`。由于Haskell中不允许赋值语句`seed = next_random(seed)`，想办法把种子`seed`放在函数的参数里，这样来接受输入。进一步，Monad在这个情形中，可以认为是用函数的参数实现了赋值语句的能力，赋值被Monad隐藏了。
 
+从编程的角度，Monad有两个接口：return/unit和bind。实现这个两个操作的类型，就可以称之为Monad。就像光有些情况下，如光电效应实验，粒子性显著一些，另一些情况下，如干涉和衍射实验，波的性质显著一些。光的粒子性和波动性，依赖实验设备。同样，Monad一些情况下可以看做容器，如Maybe Monad，return一个数据到Monad，用bind从Monad取出来。另一些情况看作有状态的函数，如State Monad。Monad不仅仅是用来处理副作用，典型的处理副作用的Monad：IO Monad.
 
 但这样去理解Monad，会有偏差。维特根斯坦说： a definition of logical form as opposite to logical matter"“(对逻辑形式，而非逻辑内容的定义)。不能用monad的应用来定义monad，而只能依靠monad的形式。
+
+## todo
 
 编程中经常遇到CPS(可以理解为计算中的延续)，是Monad中的一种，适合IoC(Inversion of Control，控制反转，也是DI:Dependency Injection)场景。
 IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”好莱坞原则"，据说是好莱坞经纪人的口头禅。 IoC在编程中的典型例子：回调函数。`sync(param,cb)`，`sync`执行结束，才执行`cb`。从写法上看，似乎sync和cb是并行执行的。
 
+## todo
 综上，Monad的效果：赋值表面上是看不见的，顺序计算表面上是并行的。
 
 回调函数的使用会导致很多问题(callback hell，和回调函数的信任问题)。在JavaScript中，用Promise可以处理回调函数带来的问题。形式上，把横向的函数调用变成竖直的，解决callback hell。Promise本身的状态只有三种，而且只会处于其中一种，解决了回调函数的信任问题。我们从Monad的层面来分析一下Promise。
+
+## Monad典型种类与JavaScript实现
+
+### 最简单的Monad: Identity Monad
+
+仅仅是wrap一个值。
+
+``` JavaScript
+function Identity(value) {
+    this.value = value;
+}
+
+Identity.prototype.bind = function (transform) { return transform(this.value)};
+new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
+```
+
+### Maybe Monad
+
+除了像Identity Monad存储值，还可以表征缺少值。如果计算遇到Nothing，则随后的计算停止，直接返回Nothing。
+
+``` JavaScript
+
+function Just(value) {
+    this.value = value;
+}
+
+Just.prototype.bind = function (transform) { return transform(this.value)};
+
+let Nothing = {
+    bind: function() {
+        return this;
+    }
+};
+
+let result = new Just(5).bind(value =>
+                 Nothing.bind(value2 =>
+                      new Just(value + value2)));
+
+```
+
+#### 可以用于避免因为null而产生的错误：
+
+``` JavaScript
+
+function getUser() {
+    return {
+        getAvatar: function() {
+            return null; // no avatar
+        }
+    };
+}
+
+```
+1. 捕获异常
+
+``` JavaScript
+try {
+    let url = getUser().getAvatar().url;
+    console.log(url); // this never happens
+} catch (e) {
+    console.log('Error: ' + e);
+}
+
+```
+
+2. 或者做null检测
+
+``` JavaScript
+let user = getUser();
+if (user !== null) {
+    let avatar = user.getAvatar();
+    if (avatar !== null) {
+        url = avatar.url;
+    }
+}
+
+```
+3. 使用Maybe Monad
+
+``` JavaScript
+function getUser(){
+    return new Just({
+        getAvatar: function(avatar) {
+            if (avatar) { // has avatar?
+                return new Just(avatar);
+            } else {
+                return Nothing; // no avatar
+            }
+        }
+    })};
+
+let url = getUser()
+        .bind(user => user.getAvatar())
+        .bind(avatar => avatar.url);
+
+if (url instanceof Just) {
+    console.log('URL has value: ' + url.value);
+} else {
+    console.log('URL is empty.');
+}
+
+```
 
 ## Promise(Continuation Monad)
 
@@ -42,15 +146,15 @@ IoC 的核心思想是 “Don’t call me, I’ll call you”，也被叫作”�
 Promise即Cont Monad处理异步很有用。
 
 unit funciton，warp数据返回Promise：`Promise.resolve(value)`
-bind funciton，变换数据并返回Promise： `Promise.prototype.then(onFullfill: value => Promise)`
+bind funciton，变换数据并返回Promise： `Promise.prototype.then(value => Promise)`
 
 证明单位元：e + a = a
 
 ``` JavaScript
-Promise.resolve(Promise.resolve(3)).then(result => console.log(result));
+Promise.resolve(3).then(result => console.log(result));
 // 3
 
-Promise.resolve(3).then(result => console.log(result));
+Promise.resolve(Promise.resolve(3)).then(result => console.log(result));
 // 3
 ```
 
@@ -145,7 +249,7 @@ composeCPS(async, async)(urlString)
 a. 组合对象从函数，修改为doneObj
 
 ``` JavaScript
-const createDoneObj = done  => {{done}};
+const createDoneObj = done  => ({done});
 
 const async = url => {
     return createDoneObj(cb => ajax(url, cb)) ;
@@ -183,108 +287,14 @@ async('urlString')
     .done(result => console.log(reslut));
 ```
 
-## Monad典型种类与JavaScript实现
-
-### 最简单的Monad: Identity Monad
-
-仅仅是wrap一个值。
-
-``` JavaScript
-function Identity(value) {
-    this.value = value;
-}
-
-Identity.prototype.bind = funciton (transform) { return transform(this.value)};
-new Identity(5).bind(a => new Identity(6).bind(b => console.log(a + b)));
-```
-
-### Maybe Monad
-
-除了像Identity Monad存储值，还可以表征缺少值。如果计算遇到Nothing，则随后的计算停止，直接返回Nothing。
-
-``` JavaScript
-
-function Just(value) {
-    this.value = value;
-}
-
-Just.prototype.bind = function (transform) { return transform(this.value)};
-
-let Nothing = {
-    bind: function() {
-        return this;
-    }
-};
-
-let result = new Just(5).bind(value =>
-                 Nothing.bind(value2 =>
-                      new Just(value + value2)));
-
-```
-
-可以用于因为null而产生的错误：
-
-``` JavaScript
-
-function getUser() {
-    return {
-        getAvatar: function() {
-            return Nothing; // no avatar
-        }
-    };
-}
-
-// 捕获异常
-try {
-    var url = getUser().getAvatar().url;
-    print(url); // this never happens
-} catch (e) {
-    print('Error: ' + e);
-}
-
-// 或者做null检测
-var user = getUser();
-if (user !== null) {
-    var avatar = user.getAvatar();
-    if (avatar !== null) {
-        url = avatar.url;
-    }
-}
-
-// 使用Maybe Monad
-
-function getUser(){
-    return new Just({
-        getAvatar: function() {
-            if (hasAvatar) {
-                return new Just(avatar);
-            } else {
-                return null; // no avatar
-            }
-        }
-    });
-
-url = getUser()
-        .bind(user => user.getAvatar())
-        .bind(avatar => avatar.url);
-}
-
-// 这样写，似乎会导致一个麻烦，不知道哪一步产生了null值。
-// 这个写法本质上，消除了赋值语句，而正是赋值语句报错或判空，才知道是哪一步有问题。
-
-if (url instanceof Just) {
-    print('URL has value: ' + url.value);
-} else {
-    print('URL is empty.');
-}
-
-```
 
 ## React Hooks
 
+pure functon 中利用 effects 去管理状态。
+
 ### 问题
 
-#### Sophie Alpert，Hooks为了解决三个问题：
+#### Hooks为了解决三个问题(Sophie Alpert)：
 
 >1. Reusing logic.目前的解决方案是HOCs和Render props，这两种方式会造成Components的不断嵌套，代码很难维护。 Giant components.
 >2. react component中的有许多的lifecycle，在不同的lifecycle里面做不同的事情，开发人员需要将注意力分散到不同的lifecycle中去。
@@ -296,8 +306,7 @@ class中用bind或箭头函数。
 
 #### 复用
 
-复用业务代码很麻烦。拆组件，然后要么render props，或render childrend，要么HoC，最不济props。修改组件就很麻烦。如果设计得要更灵活，就导致props或组件增加很多
-
+复用业务代码很麻烦。拆组件，然后要么render props，或render children，要么HoC，最不济props。修改组件就很麻烦。如果设计得要更灵活，就导致props或组件增加很多
 
 写法上组件有wrapper hell问题，嵌套太深，性能也不好。
 
@@ -348,13 +357,8 @@ function Counter({initialState}) {
 }
 ```
 
-### 优缺点
 
-## Iterators and Generators(JavaScript)
-
-### Generators and Monad
-
-## scheme的流和Generators
+## 赋值和局部状态
 
 我们设计一个过程rand，每次调用会返回一个随机选出的整数。
 
@@ -365,7 +369,6 @@ function Counter({initialState}) {
 
 如果随机是序列中每一个数与前一个数无关，那么rand-update生成的数列肯定不是随机的。真正的随机序列与伪随机序列的关系很复杂。
 
-### 赋值和局部状态
 
 如果允许赋值，我们可以把rand实现为：
 
@@ -382,7 +385,7 @@ function Counter({initialState}) {
 
 我们实现一个用随机数实现蒙特卡罗模拟：从一个大集合里随机选择样本，对试验的统计估计的基础上做出推断。6/(pi)^2是随机选择两个整数之间没有公因子（最大公因子GCD是1）的概率，利用这个特性来估计pi的值。
 
-### 允许赋值
+### 允许赋值的实现
 
 ``` scheme
 (define (estimate-pi trials)
@@ -402,7 +405,7 @@ function Counter({initialState}) {
 
 ```
 
-### 不允许赋值
+### 不允许赋值的实现
 
 ``` scheme
 (define (estimate-pi trials)
@@ -434,60 +437,8 @@ function Counter({initialState}) {
 
 而引入赋值之后，符号不能再作为值的名称。变量索引了一个环境中可以保存值的位置，存储在那里的值可以改变。使用赋值的程序设计，称之为命令式程序设计。会导致计算模型复杂，同时会导致一些不容易出现函数式编程中的错误。赋值与时间顺序显式的相关，那么一个变量放在另一个之前，还是之后，就很不易处理。
 
-### 流
 
-流优点在于，能忽略程序中各个时间的实际发生顺序，这是赋值无法做到的事情，赋值就需要考虑时间和变化。
-
-#### 流的实现
-
-流有构造函数`cons-stream`，和两个选择函数`stream-car`和`stream-cdr`，满足两个条件：
-
-- (stream-car (cons-stream x y)) = x
-- (stream-cdr (cons-stream x y)) = y
-
-流基于delay的特殊形式实现，`(delay <exp>)`的求值将不对表达式`<exp>`求值，而是返回一个延时对象，可以看做是未来的某个时间求值`<exp>`的许诺。与之对应，有force，迫使delay完成所许诺的求值。(延时想起了，类似的定义，jQuery中Ajax的deferred)
-
-使用序对来构造流，不过cdr部分放的并非是流的后面的部分，而是存放的可以计算其的许诺。
-
-`(cons-stream <a> <b>)` 等价于 `(cons <a> (delay <b>))`。
-
-delay和force怎么实现呢？delay可以看做一个函数，执行的时候才求值，而force则只需要执行这个函数即可。
-
-cons-stream则可以实现为：
-
-``` scheme
-(define (cons-stream exp delay)
-    (cons exp (lamdba () (delay))))
-
-; 定义正整数无穷流
-(define (integers-startring-from n)
-    (const-stream n (integers-startring-from (+ n 1))))
-(define integers-stream (integers-startring-from 1))
-```
-
-`(delay <exp>)`其实是语法糖`(lambda () <exp>)`。而force不过是无参的调用过程：
-
-``` scheme
-(define (force delayed-object)
-    (delayed-object))
-```
-
-
-``` scheme
-
-(define (stream-car stream) (car stream))
-(define (stream-cdr stream) (force (cdr stream)))
-
-; map
-(define (stream-map proc s)
-    (if (stream-null? s)
-        the-empty-stream
-        (cons-stream (proc (stream-car s))
-            (stream-map proc (stream-cdr s)))))
-
-```
-
-#### monte-carlo流的实现
+#### 不允许赋值的monte-carlo流的实现
 
 ``` scheme
 ; 随机数流
@@ -524,12 +475,6 @@ cons-stream则可以实现为：
 
 通过流，也构造了一个模块化的monte-carlo过程，无赋值，无状态。
 
-#### 流是Monad吗？
-
-unit是什么？
-bind是怎么实现？
-
-
 ## Monad缺点
 
 Dijkstra语录：
@@ -542,9 +487,11 @@ Dijkstra语录：
 
 ## 资料
 
-### Monad
+### todo
 
-SICP
+- [Monad入门](https://thzt.github.io/2015/03/07/monad/)
+
+### done
 
 - [函数式语言的宗教](http://www.yinwang.org/blog-cn/2013/03/31/purely-functional)
 
@@ -555,10 +502,6 @@ SICP
 - [从函数式编程到Promise](https://blog.fundebug.com/2017/06/21/write-monad-in-js/)
 
 - [Monads in JavaScript](https://curiosity-driven.org/monads-in-javascript#)
-
-### 流
-
-- [流，计数与生成函数](http://notebook.xyli.me/SICP/stream-count-and-generating-function/)
 
 ## change log
 
@@ -572,3 +515,5 @@ SICP
 - 2019/4/7 晚上，整理React Hooks资料
 - 2019/4/11 半夜，整理Generators资料
 - 2019/4/11 上午，移除范畴论，新建数学文档
+- 2019/4/29 上午，修改代码，以及语言组织
+- 2019/4/29 上午，删除有关流的章节，新建文档描述流

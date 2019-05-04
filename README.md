@@ -1,5 +1,52 @@
 # 计算机程序的沉思和笔记
 
+
+## 文档
+
+### Lisp
+
+- [Algebraic Effects](./Lisp/Algebraic_Effects.md)
+
+- [monad](./Lisp/monad.md)
+
+- [comonad](./Lisp/comonad.md)
+
+
+### React
+
+- [Hooks](./React/Hooks.md)
+
+- [React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
+
+### IDE
+
+- [IntelliJ](./IDE/IntelliJ.md)
+
+### front end
+
+- [bigpipe](./front_end/bigpipe.md)
+
+- [iframe](./front_end/iframe.md)
+
+- [analytics](./front_end/analytics.md)
+
+- [browser rendering](./front_end/browser_rendering.md)
+
+
+
+## todolist
+
+
+- [mathematics](./Lisp/mathematics.md)
+
+- [Gaussian Blur](./mathematics/Gaussian_Blur.md)
+
+- [cache](./front_end/cache/cache_api.md)
+
+- 前端cache
+
+- 修改org格式为markdown格式
+
 ## 摘录SICP
 
 > 我认为，在计算机科学中保持计算中的趣味性是特别重要的事情。我认为，我们的责任是去拓展这一领域，将其发展到新的方向，并在自己家里保持趣味性。我希望，我们不要变成传道士，不要认为你是兜售圣经的人。你所掌握的，也是我认为并希望的，也就是智慧：那种看到这一机器比你第一次站在他面前能做得更多的能力。这样你才能将他向前推进。
@@ -17,42 +64,8 @@ Alan J. Perlis
 > - 组合的方法。简单个体构造复合元素
 > - 抽象的方法。通过这个抽象的方法，为复合对象命名，并将它当做单元去操作
 
-## 文档
-
-### React
-
-- [React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
-
-### IDE
-
-- [IntelliJ](./IDE/IntelliJ.md)
-
-### front_end
-
-- [bigpipe](./front_end/bigpipe.md)
-
-- [iframe](./front_end/iframe.md)
-
-- [analytics](./front_end/analytics.md)
-
-## todolist
-
-- [monad](./Lisp/monad.md)
-
-- [comonad](./Lisp/comonad.md)
-
-- [mathematics](./Lisp/mathematics.md)
-
-- [Gaussian Blur](./mathematics/Gaussian_Blur.md)
-
-- [cache](./front_end/cache/cache_api.md)
-
-- 思考React的Hooks
-
-- 前端cache
-
-- 修改org格式为markdown格式
-
 ## change log
 
 - 2019/4/21 新增todolist，尽量保持关注的连续性，不可东一榔头，西一棒槌
+
+- 2019/4/29 更细文章列表
