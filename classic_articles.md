@@ -2,6 +2,8 @@
 
 ## Lisp
 
+- [面向对象语言里面使用函数式编程的技巧](http://www.blogjava.net/ajoo/category/6968.html)
+
 - [为什么Lisp语言如此先进？（译文）](http://www.ruanyifeng.com/blog/2010/10/why_lisp_is_superior.html)
 
 - [Lisp的本质(The Nature of Lisp)](https://www.cnblogs.com/Leap-abead/articles/762180.html)
