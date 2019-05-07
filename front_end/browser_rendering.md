@@ -119,36 +119,21 @@ console.log('script end');
 
 ``` JavaScript
 
-class nonEssentialWork {
-    constructor(task, timeout) {
-        this.tasks = task || [];
-        this.timeout = timeout || 0;
+function idleCallback(params) {
+    const { heavyWork, didTimeout=0, isDone, afterDone } = params;
+    console.log( heavyWork, didTimeout, isDone, afterDone );
+    if (isDone()) {
+        afterDone && afterDone();
+        return;
     }
 
-    getTasks = () => {
-        return this.tasks;
-    }
-
-    push = (task) => {
-        this.tasks.push(task);
-    }
-
-    clean = () => {
-        this.tasks = [];
-    }
-
-    main = () => {
-        let timeout = this.timeout;
-        requestIdleCallback((deadline) => {
-            while((deadline.timeRemaining() > 0 || deadline.didTimeout) && this.tasks.length > 0) {
-               this.tasks.pop()();
-            }
-            if (this.tasks.length > 0) {
-                requestIdleCallback(this.main, {timeout});
-            }
-        }, {timeout});
-    }
-};
+    requestIdleCallback(function (deadline) {
+        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && !isDone()) {
+            heavyWork();
+        }
+        idleCallback(params);
+    }, {didTimeout});
+}
 
 ```
 

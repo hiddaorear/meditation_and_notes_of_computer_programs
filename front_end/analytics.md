@@ -52,25 +52,43 @@ function log(logType, data) {
 
 ``` javascript
 
-// by alsotang, form github alsotang/ric.js
-// 有修改
-let idleCallback = ( heavyWork, isDone, afterDone, timeout ) => {
-
-    if (isDone && isDone()) {
-       afterDone && afterDone();
-       return ;
+function idleCallback(params) {
+    const { heavyWork, didTimeout=0, isDone, afterDone } = params;
+    console.log( heavyWork, didTimeout, isDone, afterDone );
+    if (isDone()) {
+        afterDone && afterDone();
+        return;
     }
 
-    requestIdleCallback((deadline) => {
-        while((deadline.timeRemaining() > 0 && (isDone && !isDone())) || deadline.didTimeout) {
+    requestIdleCallback(function (deadline) {
+        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && !isDone()) {
             heavyWork();
         }
-    }, {timeout});
+        idleCallback(params);
+    }, {didTimeout});
+}
 
-    idleCallback( heavyWork, isDone, afterDone, timeout );
+var REPORT_URL = 'https://github.com/';
+var IP_LIST = ['127.0.0.1', '127.0.0.1'];
+
+var work = {
+    didTimeout: 1000,
+    done: false,
+    heavyWork: () => {
+        this.done = true;
+        console.log('work');
+    },
+    isDone: () => {
+        return this.done;
+    },
+    afterDone: () => {
+        console.log('done');
+    }
 };
+idleCallback(work);
 
-idleCallback(log('test', {test: 123}), null, null, 1000);
+
+
 ```
 
 ## 关键指标
@@ -215,7 +233,17 @@ function c(q) {
 
 > 因为一个大脚本的运行回产生大量的“垃圾”，浏览器垃圾回收也会相应地更频繁的启动，从而造成LOG数据丢失
 
+## Codeless Tracking(无埋点技术)
+
+
+
 # 参考资料
+
+- [揭开JS无埋点技术的神秘面纱](http://unclechen.github.io/2018/06/24/%E6%8F%AD%E5%BC%80JS%E6%97%A0%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1/)
+
+- [JS埋点技术分析](http://unclechen.github.io/2017/12/24/JS%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E5%88%86%E6%9E%90/)
+
+- [神奇的Shadow DOM](https://aotu.io/notes/2016/06/24/Shadow-DOM/index.html)
 
 - 《现代前端技术解析》by 张成文
 
@@ -232,3 +260,5 @@ function c(q) {
 - 2019/4/22 created doc
 
 - 2019/4/23 未能细致整理，由于有自己思考的切入点了，这里暂时直接使用参考资料文字
+
+- 2019/5/7 新增Codeless Tracking无埋点技术
