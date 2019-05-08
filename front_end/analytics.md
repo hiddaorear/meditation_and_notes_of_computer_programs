@@ -37,7 +37,7 @@
 ### 白屏时间(first paint time)
 
 - 定义： 打开页面到页面开始有东西渲染。 白屏时间 = 浏览器渲染出第一个元素 - 页面访问时间点；
-- 标准： 无
+- 标准： 百度(263ms)
 
 first paint time没有写入标准的原因：[first paint time](https://github.com/w3c/navigation-timing/issues/21)。主要原因，白屏时间标准，定义很模糊。如果以画出第一个像素作为时间，那么遇到本来就是空白的页面怎么处理？
 
@@ -75,6 +75,8 @@ first paint time没有写入标准的原因：[first paint time](https://github.
 
 #### chrome技术实现(firstPaintTime)
 
+navigationStart：当前浏览器窗口的前一个网页关闭，发生unload事件时的Unix毫秒时间戳。如果没有前一个网页，则**等于fetchStart属性**。
+
 ``` html
 
 <!DOCTYPE HTML>
@@ -84,7 +86,7 @@ first paint time没有写入标准的原因：[first paint time](https://github.
         <script src="script.js"></script>
         <script>
             window.onload = function() {
-                requestAnimationFrame(function() {
+                requestIdleFrame(function() {
                     let firstPaintTime = window.chrome.loadTimes().firstPaintTime * 1000 - window.performance.timing.navigationStart;
                     console.log(firstPaintTime);
                 });
@@ -119,6 +121,8 @@ PC版网站抽样(单位ms)
 - 标准： 移动端，最长3s，推荐值为1.5s以内； PC端，最长1.5s，推荐值为1s以内
 - 技术实现： 通常统计首屏内图片的加载时间（首屏内加载最慢的一张图片）
 
+具体技术实现思路：`计算首屏大小 -> 找出其中图片 -> 绑定首屏图片的load事件 -> load触发之后判断是否在首屏内，并找出最慢的一张 -> 最慢的一张图片的加载时间，即首屏时间`
+
 #### 注意
 
 - 页面存在iframe的情况
@@ -129,7 +133,7 @@ PC版网站抽样(单位ms)
 
 ### 用户可操作时间
 
-- 定义：默认可以认为是domready的时间。用户可以正常操作，如：点击，输入等
+- 定义：默认可以认为是domready(即DOMContentLoaded)的时间。用户可以正常操作，如：点击，输入等
 - 标准: 无
 
  PC版网站抽样(单位ms)
@@ -160,6 +164,68 @@ PC版网站抽样(单位ms)
 | 腾讯课堂 | 4028 |
 
  PC推荐3000ms内(视具体情况而定，图片加载影响很大，如果网站图片较多，则放宽)
+
+## Chorme标准
+
+[Chrome 64 to deprecate the chrome.loadTimes() API](https://developers.google.com/web/updates/2017/12/chrome-loadtimes-deprecated#startloadtime)
+
+### FP(First Paint)
+
+首次绘制包括了任何用户自定义的背景绘制，它是首先将像素绘制到屏幕的时刻。(与白屏时间相关)
+
+
+``` JavaScript
+
+function firstPaintTime() {
+  if (window.PerformancePaintTiming) {
+    const fpEntry = performance.getEntriesByType('paint')[0];
+    return (fpEntry.startTime + performance.timeOrigin) / 1000;
+  }
+}
+
+```
+
+### FCP(First Contentfull Paint)
+
+首次内容绘制是浏览器将第一个 DOM 渲染到屏幕的时间。(与白屏时间相关)
+
+`window.performance.getEntriesByType('paint')`
+
+### DCL(DOMContentLoaded Event)
+
+也叫DOM ready。
+
+HTML文档完全加载和解析之后，DOMContentLoaded事件就被触发。无需等待CSS，image和iframe完成加载。注意：DOMContentLoaded事件必须等待其所属script之前的CSS加载完成才会触发(JS可能依赖他前面的CSS用于计算)。
+
+UI渲染引擎和JS执行引擎是互斥的，JS引擎执行，则UI线程会被挂起。但JS加载与UI渲染不一定互斥。同步script的加载会导致DOM树构建的暂停。这种情况下，会对DOMContentLoaded造成影响。但带`async`和`defer`的外部脚本，浏览器不会等待其加载完成和执行。注意，这两个标识仅仅对外部脚本起作用。
+
+`async`和`defer`的外部脚本，浏览器会在后台加载脚本(并行)，加载完成之后，`defer`等到页面加载解析完成之后才执行，在`DOMContentLoader`之前；而`async`脚本，则会导致文档停止解析(如果文档还没解析完成)，执行脚本，执行完之后，文档接着解析，可能会影响`DOMContentLoader`事件。
+
+![async and defer](./async_and_defer.png)
+
+
+|  | async | defer |
+| :------| :------: | :------: |
+| 顺序 | 在页面出现顺序，不影响执行顺序  | 依照页面出现顺序执行|
+| DOMContentLoaded | 影响  |不影响|
+
+
+``` JavaScript
+
+document.addEventListener('DOMContentLoaded', function(){
+    console.log('DOMContentLoaded');
+});
+
+```
+
+### L(Onload Event)
+
+在文档装载完成后会触发  load 事件。此时，在文档中的所有对象都在DOM中，所有图片，脚本，链接以及子框都完成了装载。
+
+document.addEventListener('load', function(){
+    console.log('load');
+});
+
 
 
 ### PC版网站JS和CSS包大小(单位KB)
@@ -364,3 +430,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/5/7 新增Codeless Tracking无埋点技术
 
 - 2019/5/8 上午，补充白屏时间的测量的技术实现
+
+- 2019/5/8 下午，补充首屏时间的测量的技术实现
