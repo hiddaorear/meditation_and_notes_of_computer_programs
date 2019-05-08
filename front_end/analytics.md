@@ -395,7 +395,17 @@ idleCallback(work);
 
 ```
 
-更多的改进，可以把上报的数据存储在Stroage中，批量上报。但有被清空的风险。
+### 离线日志
+
+更多的改进，可以把上报的数据存储在Stroage或IndexedDB中，批量上报。但有被清空的风险。
+
+用户的行为日志和异常日志（崩溃），可以存储在离线数据中，如滚动，翻页，badjs等。
+
+日志上传：
+
+- 有事件产生，调用日志记录，将离线日志上传到服务端。时效性好，但流量大，占用宽带，服务端压力大
+- 暂存在本地，达到一定量，网络允许的情况下，批量上传。时效性差；但占用宽带小，给服务的造成的压力小
+
 
 ## 技术注意事项
 
@@ -466,13 +476,17 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 
 ## 参考资料
 
+- 《现代前端技术解析》by 张成文
+
 - [揭开JS无埋点技术的神秘面纱](http://unclechen.github.io/2018/06/24/%E6%8F%AD%E5%BC%80JS%E6%97%A0%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1/)
 
 - [JS埋点技术分析](http://unclechen.github.io/2017/12/24/JS%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E5%88%86%E6%9E%90/)
 
 - [神奇的Shadow DOM](https://aotu.io/notes/2016/06/24/Shadow-DOM/index.html)
 
-- 《现代前端技术解析》by 张成文
+- [移动应用要如何埋点上传才能收集更多数据？ 离线日志](https://dbaplus.cn/news-73-633-1.html)
+
+- [打造前端离线日志(一): IndexedDB](https://juejin.im/post/5c91b3c86fb9a070cf6bcab2?utm_medium=hao.caibaojian.com&utm_source=hao.caibaojian.com#heading-1)
 
 - [网站统计那些事（一）：背景与基础概念](https://afantasy.ninja/2017/05/08/user-tracking-i/)
 
@@ -493,3 +507,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/5/8 上午，补充白屏时间的测量的技术实现
 
 - 2019/5/8 下午，补充首屏时间的测量的技术实现
+
+- 2019/5/8 晚上，补充离线日志
