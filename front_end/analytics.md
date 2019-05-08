@@ -1,6 +1,6 @@
 # analytics
 
-## 切入点
+## 关键指标
 
 ### 用户唯一标识
 
@@ -8,94 +8,8 @@
 
 网站统计多数是要基于用户的数据，所以第一步，要识别用户。
 
-### 上报的请求
-
-#### 朴素实现
-
-为了避免ajax的不便之处，一般用`Image src`的方式上报。代码例子：
-
-``` javascript
-// 上报数据
-// @param  {String} logType 上报日志的类型
-// @param  {Object} data    上报的数据内容
-function log(logType, data) {
-    var queryArr = [];
-    for(var key in data) {
-      queryArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-    }
-    var queryString = queryArr.join('&');
-    var uniqueId = "log_"+ (new Date()).getTime();
-    var image = new Image(1,1);
-
-    window[uniqueId] = image;   // use global pointer to prevent unexpected GC
-
-    // 如果使用服务器的域名地址上报失败，则随机使用一个备用 IP 列表中的服务器进行上报
-    image.onerror = function() {
-      var ip = IP_LIST[Math.floor(Math.random() * IP_LIST.length)];
-      image.src = window.location.protocol + '//' + ip + '/j.gif?act=' + logType + '&' + queryString;
-      image.onerror = function() {
-        window[uniqueId] = null;  // release global pointer
-      };
-    };
-
-    image.onload = function() {
-      window[uniqueId] = null; // release global pointer
-    };
-
-    image.src = REPORT_URL + '?act=' + logType + '&' + queryString;
-}
-```
-
-以上基本实现存在的问题：调用之后立即执行上报逻辑，可能影响页面性能
-
-#### 改进
-
-``` javascript
-
-function idleCallback(params) {
-    const { heavyWork, didTimeout=0, isDone, afterDone } = params;
-    console.log( heavyWork, didTimeout, isDone, afterDone );
-    if (isDone()) {
-        afterDone && afterDone();
-        return;
-    }
-
-    requestIdleCallback(function (deadline) {
-        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && !isDone()) {
-            heavyWork();
-        }
-        idleCallback(params);
-    }, {didTimeout});
-}
-
-const REPORT_URL = 'https://github.com/';
-const IP_LIST = ['127.0.0.1', '127.0.0.1'];
-
-const work = {
-    didTimeout: 1000,
-    done: false,
-    heavyWork: () => {
-        this.done = true;
-        console.log('work');
-    },
-    isDone: () => {
-        return this.done;
-    },
-    afterDone: () => {
-        console.log('done');
-    }
-};
-idleCallback(work);
-
-
-
-```
-
-更多的改进，可以把上报的数据存储在Stroage中，批量上报。但有被清空的风险。
-
-## 关键指标
-
 ### PV(Page View)
+
 - 定义：一天之内，页面被所有用户访问总次数。 每一次刷新会增加一次PV
 - 用途：统计关键页面或临时推广性页面的PV，考察访问量或推广效果； 作为单页面统计参数
 - 缺点：PV统计不做限制，可以人为的刷新页面提升数据，单纯看着PV无法反应页面被用户访问的具体情况
@@ -117,12 +31,75 @@ idleCallback(work);
 
 - 定义：用户从进入网站到离开，整个过程只算一次；针对整个网站的统计指标
 
+
 ## 前端技术指标
 
-### 白屏时间(first Paint Time)
+### 白屏时间(first paint time)
 
-- 定义： 打开页面到页面开始有东西渲染。 白屏时间 = 浏览器渲染出第一个元素 - 页面访问时间点； 通常认为是渲染body或解析完head的时间点
+- 定义： 打开页面到页面开始有东西渲染。 白屏时间 = 浏览器渲染出第一个元素 - 页面访问时间点；
 - 标准： 无
+
+first paint time没有写入标准的原因：[first paint time](https://github.com/w3c/navigation-timing/issues/21)。主要原因，白屏时间标准，定义很模糊。如果以画出第一个像素作为时间，那么遇到本来就是空白的页面怎么处理？
+
+#### 传统技术实现
+
+分析视图(WebPagetest)，白屏时间出现在**头部外链资源加载完附近**，原因在于浏览器加载并解析头部资源，才渲染页面，不必到CSS树和DOM树的解析，而是马上显示中间结果。根据这个观察的经验，得出经验意义上的测量的技术实现，并不精确。
+
+这样，如果知道了渲染首字节的时间，和头部资源加载的时间，我们两者相减，就可以得出白屏时间。由于JS需要等待在其之前JS和CSS加载完，才执行，也就是JS的执行是有顺序的，因此，我们可以在head中所有资源加载之前打点，得到开始加载的时间点，在head最后打点，得到加载完成的时间点。
+
+``` html
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <script>
+          var start_time = +new Date; //测试时间起点，实际统计起点为 DNS 查询
+         // 更精确的实现，服务器在此处给出时间戳。或，performance.timing.navigationStart
+        </script>
+        <script src="script.js"></script>
+        <script>
+          var end_time = +new Date; //时间终点
+          var headtime = end_time - start_time; //头部资源加载时间
+          // 或者
+          // var headtime = end_time - performance.timing.navigationStart
+          console.log(headtime);
+        </script>
+    </head>
+    <body>
+        <p>在头部资源加载完之前页面将是白屏</p>
+    </body>
+</html>
+
+```
+
+#### chrome技术实现(firstPaintTime)
+
+``` html
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <script src="script.js"></script>
+        <script>
+            window.onload = function() {
+                requestAnimationFrame(function() {
+                    let firstPaintTime = window.chrome.loadTimes().firstPaintTime * 1000 - window.performance.timing.navigationStart;
+                    console.log(firstPaintTime);
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <p>在头部资源加载完之前页面将是白屏</p>
+    </body>
+</html>
+
+
+
+```
+
 
 PC版网站抽样(单位ms)
 
@@ -137,6 +114,7 @@ PC版网站抽样(单位ms)
  PC推荐250ms内
 
 ### 首屏时间
+
 - 定义： 首屏内所有内容渲染出来的时间。 首屏时间 = 浏览器首屏渲染完成 - 页面访问时间点
 - 标准： 移动端，最长3s，推荐值为1.5s以内； PC端，最长1.5s，推荐值为1s以内
 - 技术实现： 通常统计首屏内图片的加载时间（首屏内加载最慢的一张图片）
@@ -150,6 +128,7 @@ PC版网站抽样(单位ms)
 - 解析到某个元素，则首屏完成，可以在这个元素之后加入script计算时间
 
 ### 用户可操作时间
+
 - 定义：默认可以认为是domready的时间。用户可以正常操作，如：点击，输入等
 - 标准: 无
 
@@ -166,6 +145,7 @@ PC版网站抽样(单位ms)
  PC推荐1500ms内
 
 ### 总下载时间
+
 - 定义： 所有资源加载完成的时间，即页面onload时间
 - 标准： 无
 
@@ -207,6 +187,89 @@ PC版网站抽样(单位KB)
 |1000+ms|失去耐心|
 |10000+ms|放弃|
 
+## 上报的实现
+
+### 朴素实现
+
+为了避免ajax的不便之处，一般用`Image src`的方式上报。代码例子：
+
+``` javascript
+// 上报数据
+// @param  {String} logType 上报日志的类型
+// @param  {Object} data    上报的数据内容
+function log(logType, data) {
+    var queryArr = [];
+    for(var key in data) {
+      queryArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+    }
+    var queryString = queryArr.join('&');
+    var uniqueId = "log_"+ (new Date()).getTime();
+    var image = new Image(1,1);
+
+    window[uniqueId] = image;   // use global pointer to prevent unexpected GC
+
+    // 如果使用服务器的域名地址上报失败，则随机使用一个备用 IP 列表中的服务器进行上报
+    image.onerror = function() {
+      var ip = IP_LIST[Math.floor(Math.random() * IP_LIST.length)];
+      image.src = window.location.protocol + '//' + ip + '/j.gif?act=' + logType + '&' + queryString;
+      image.onerror = function() {
+        window[uniqueId] = null;  // release global pointer
+      };
+    };
+
+    image.onload = function() {
+      window[uniqueId] = null; // release global pointer
+    };
+
+    image.src = REPORT_URL + '?act=' + logType + '&' + queryString;
+}
+```
+
+以上基本实现存在的问题：调用之后立即执行上报逻辑，可能影响页面性能
+
+### 使用requestIdleCallback改进
+
+``` javascript
+
+function idleCallback(params) {
+    const { heavyWork, didTimeout=0, isDone, afterDone } = params;
+    console.log( heavyWork, didTimeout, isDone, afterDone );
+    if (isDone()) {
+        afterDone && afterDone();
+        return;
+    }
+
+    requestIdleCallback(function (deadline) {
+        while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && !isDone()) {
+            heavyWork();
+        }
+        idleCallback(params);
+    }, {didTimeout});
+}
+
+const REPORT_URL = 'https://github.com/';
+const IP_LIST = ['127.0.0.1', '127.0.0.1'];
+
+const work = {
+    didTimeout: 1000,
+    done: false,
+    heavyWork: () => {
+        this.done = true;
+        console.log('work');
+    },
+    isDone: () => {
+        return this.done;
+    },
+    afterDone: () => {
+        console.log('done');
+    }
+};
+idleCallback(work);
+
+```
+
+更多的改进，可以把上报的数据存储在Stroage中，批量上报。但有被清空的风险。
+
 ## 技术注意事项
 
 ### `image src`请求没有发出问题
@@ -244,7 +307,6 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 
 ### 标记
 
-
 #### 标记的交互实现
 
 一般把需要埋点的业务页面，嵌入数据统计的平台页面中。一般以iframe的形式。然后在业务页面中点击鼠标右键（避免和正常点击事件一样，造成a标签跳转），弹窗，填写需要上报的维度信息。弹窗可能会影响原始的业务页面布局和DOM结构，怎么避免呢？
@@ -275,8 +337,7 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 
 我们可以引入JS，允许打点的时候，执行一个JS函数，上报这个函数输出的结果即可。
 
-
-# 参考资料
+## 参考资料
 
 - [揭开JS无埋点技术的神秘面纱](http://unclechen.github.io/2018/06/24/%E6%8F%AD%E5%BC%80JS%E6%97%A0%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1/)
 
@@ -301,3 +362,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/4/23 未能细致整理，由于有自己思考的切入点了，这里暂时直接使用参考资料文字
 
 - 2019/5/7 新增Codeless Tracking无埋点技术
+
+- 2019/5/8 上午，补充白屏时间的测量的技术实现
