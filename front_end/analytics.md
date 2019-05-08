@@ -87,6 +87,7 @@ navigationStart：当前浏览器窗口的前一个网页关闭，发生unload�
         <script>
             window.onload = function() {
                 requestIdleFrame(function() {
+                    // 有误
                     let firstPaintTime = window.chrome.loadTimes().firstPaintTime * 1000 - window.performance.timing.navigationStart;
                     console.log(firstPaintTime);
                 });
@@ -102,18 +103,26 @@ navigationStart：当前浏览器窗口的前一个网页关闭，发生unload�
 
 ```
 
+所有数据均在wifi情况下测试，均为网站主页。单位为ms，load时间单位为s，`移动端数据 - PC数据`，以此格式记录数据。随机测量，使用Chrome硬刷新。由于时间和精力，不细致分析原因，只用于初略的参考数据，用于和自己开发的页面，做大致的性能对比。其他性能测量与此相同。
 
-PC版网站抽样(单位ms)
+PC和移动网站抽样(单位ms)
+
+
+测量代码：
+
+``` JavaScript
+var loadTimes =  window.chrome.loadTimes();
+fpTime =  (loadTimes.firstPaintTime  -  loadTimes.startLoadTime) * 1000;
+console.log('白屏时间: ', fpTime);
+```
 
 |站点  | 白屏时间 |
 | :------| :------: |
-| 淘宝 | 138 |
-|京东  | 292 |
-| 头条(https://www.toutiao.com/) | 228 |
-| 头条广告投放平台(https://ad.toutiao.com/promotion/) |221  |
-| 腾讯课堂 | 1626 |
+| 百度 | `609.99 - 220.99` |
+| 淘宝 | `341.00 - 270.99` |
+| 京东 | `621.00 - 225.00` |
+| 头条 | `292.00 - 956.00` |
 
- PC推荐250ms内
 
 ### 首屏时间
 
@@ -131,39 +140,91 @@ PC版网站抽样(单位ms)
 - 无图片，则统计文字出现时间
 - 解析到某个元素，则首屏完成，可以在这个元素之后加入script计算时间
 
+
+测量代码：
+
+``` JavaScript
+var loadTimes =  window.chrome.loadTimes();
+flTime =  (loadTimes.finishLoadTime  -  loadTimes.startLoadTime) * 1000;
+console.log('首屏时间: ', flTime);
+```
+
+|站点  | 白屏时间 |
+| :------| :------: |
+| 百度 | `3891.00 - 1195.00` |
+| 淘宝 | `2388.99 - 3108.00` |
+| 京东 | `13382.99 - 48743.00` |
+| 头条 | `3102.99 - 1562.00` |
+
+
 ### 用户可操作时间
 
 - 定义：默认可以认为是domready(即DOMContentLoaded)的时间。用户可以正常操作，如：点击，输入等
 - 标准: 无
 
- PC版网站抽样(单位ms)
-
 |站点  | 用户可操作时间 |
 | :------| :------: |
-| 淘宝 | 1013 |
-|京东  | 1183  |
-| 头条(https://www.toutiao.com/) | 1607 |
-| 头条广告投放平台(https://ad.toutiao.com/promotion/) | 1690 |
-| 腾讯课堂 | 2056 |
+| 百度 | `681 - 507` |
+| 淘宝 | `620 - 1.17` |
+| 京东 | `1050 - 497` |
+| 头条 | `759 - ` |
 
- PC推荐1500ms内
 
 ### 总下载时间
 
 - 定义： 所有资源加载完成的时间，即页面onload时间
 - 标准： 无
 
- PC版网站抽样(单位ms)
+ 网站抽样(单位s)
 
 |站点  | 总下载时间 |
 | :------| :------: |
-| 淘宝 | 4092 |
-|京东  | 2810  |
-| 头条(https://www.toutiao.com/) | 1160 |
-| 头条广告投放平台(https://ad.toutiao.com/promotion/) | 2285 |
-| 腾讯课堂 | 4028 |
+| 百度 | `4.13 - 1.29` |
+| 淘宝 | `2.93 - 1.89` |
+| 京东 | `10.45 - 6.70` |
+| 头条 | `2.80 - 5.30` |
 
- PC推荐3000ms内(视具体情况而定，图片加载影响很大，如果网站图片较多，则放宽)
+
+## HTML5 性能API
+
+### 时间精度
+
+性能需要用时间来衡量，传统使用`new Date()`来说获取时间，但这个时间精度被限制在1ms内，且受系统时钟调整的影响。Performance的now方法和timeOrigin属性，可以实现更高的时间精度。
+
+- performance.timeOrigin：返回当前页面浏览上下文第一次被创建的时间的高精度时间戳
+- performance.now：返回自timeOrigin后经过的毫秒数
+
+### 常用API
+
+执行`window.performance.getEntriesByType('paint')`返回：
+
+``` JavaScript
+
+[
+    {
+        "name": "first-paint",
+        "entryType": "paint",
+        "startTime": 3196.2000000003172,
+        "duration": 0
+    },
+    {
+        "name": "first-contentful-paint",
+        "entryType": "paint",
+        "startTime": 3196.205000000191,
+        "duration": 0
+    }
+]
+
+```
+
+name当前阶段标识，entryType当前阶段所属类型，startTime当前阶段开始的时间戳，duration当前阶段持续时间。
+
+核心方法：
+
+- getEntries()：返回所有性能入口对象
+- getEntriesByType()：按类型过滤性能入口对象
+- getEntriesByName()：按名称过滤性能入口对象
+
 
 ## Chorme标准
 
@@ -190,6 +251,8 @@ function firstPaintTime() {
 首次内容绘制是浏览器将第一个 DOM 渲染到屏幕的时间。(与白屏时间相关)
 
 `window.performance.getEntriesByType('paint')`
+
+### FMP(First Meaningful Paint)
 
 ### DCL(DOMContentLoaded Event)
 
@@ -237,8 +300,6 @@ PC版网站抽样(单位KB)
 | 淘宝 | 26.0  |0|
 | 京东  | 20.5  |2.9|
 | 头条(https://www.toutiao.com/) | 32.5  |32|
-| 头条广告投放平台(https://ad.toutiao.com/promotion/) |36.8  |55.4|
-| 腾讯课堂 |34.1  |35|
 
 
  可以得出结论：一般站点的JS包为300KB左右，CSS为40KB上下浮动（偏差较大，与优化手段有关）
