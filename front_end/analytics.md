@@ -31,6 +31,10 @@
 
 - 定义：用户从进入网站到离开，整个过程只算一次；针对整个网站的统计指标
 
+### 跳出率
+
+- 定义：跳出率指单页访问次数（即访问者从入口页离开网站而未与网页互动的访问次数）所占的百分比。
+
 
 ## 前端技术指标
 
@@ -253,6 +257,8 @@ function firstPaintTime() {
 `window.performance.getEntriesByType('paint')`
 
 ### FMP(First Meaningful Paint)
+
+The time when the browser paints the content that users are interested in. This is highly depends on the page.
 
 ### DCL(DOMContentLoaded Event)
 
@@ -495,6 +501,12 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - [网站统计那些事（三）：统计脚本实现（下）](https://afantasy.ninja/2017/05/08/user-tracking-iii/)
 
 - [网站统计那些事（四）：工程化，模块化与测试](https://afantasy.ninja/2017/05/08/user-tracking-iv/)
+
+- [为什么你统计 PV 的方式是错的？](https://zhuanlan.zhihu.com/p/26341409)
+
+- [页面跳转时，统计数据丢失问题探讨](http://taobaofed.org/blog/2016/04/01/lose-statistics/)
+
+- [Page Lifecycle API 教程](http://www.ruanyifeng.com/blog/2018/11/page_lifecycle_api.html)
 
 ## change log
 
