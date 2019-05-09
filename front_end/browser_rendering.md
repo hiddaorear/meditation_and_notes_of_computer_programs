@@ -303,6 +303,12 @@ danabramov:
 
 ### 渲染优化
 
+- [企鹅辅导课程详情页毫秒开的秘密 - PWA 直出](https://juejin.im/post/5c04c3d75188252753189da9)
+
+- [React 16 加载性能优化指南](https://zhuanlan.zhihu.com/p/37148975)
+
+- [亿万级访问量下的前端同构直出实践](https://juejin.im/post/59c370d75188256bce40f1fb)
+
 - [构建时预渲染：网页首帧优化实践](https://tech.meituan.com/2018/11/15/first-contentful-paint-practice.html)
 
 
@@ -319,3 +325,5 @@ danabramov:
 - 2019/4/25 下午，修改文字描述和格式
 
 - 2019/5/4 晚上，补充首屏渲染优化条目
+
+- 2019/5/9 下午，补充渲染优化资料
