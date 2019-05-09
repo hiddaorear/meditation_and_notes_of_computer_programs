@@ -54,6 +54,7 @@ document.addEventListener('visibilitychange', function () {
   // 用户打开或回到页面
   if (document.visibilityState === 'visible') {
     document.title = '页面可见';
+    console.log("PV");
   }
 
 });
@@ -607,3 +608,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/5/8 下午，补充首屏时间的测量的技术实现
 
 - 2019/5/8 晚上，补充离线日志
+
+- 2019/5/9 晚上，补充统计PV新API，和页面生命周期
