@@ -8,38 +8,40 @@
 
 ### Lisp
 
-- [OO and FP](./Lisp/OO_and_FP.md)
+- [todo mathematics](./Lisp/mathematics.md)
 
-- [lexical scope](./Lisp/lexical_scope.md)
+- [todo OO and FP](./Lisp/OO_and_FP.md)
 
-- [type](./Lisp/type.md)
+- [todo lexical scope](./Lisp/lexical_scope.md)
 
-- [Algebraic Effects](./Lisp/Algebraic_Effects.md)
+- [todo type](./Lisp/type.md)
 
-- [monad](./Lisp/monad.md)
+- [todo Algebraic Effects](./Lisp/Algebraic_Effects.md)
 
-- [comonad](./Lisp/comonad.md)
+- [todo monad](./Lisp/monad.md)
+
+- [todo comonad](./Lisp/comonad.md)
 
 ### C++
 
-- [thread](./CPP/thread.md)
+- [todo thread](./CPP/thread.md)
 
 ### backend development
 
-- [koa](./backend_development/koa.md)
+- [todo koa](./backend_development/koa.md)
 
 ### database
 
-- [SQL](./database/SQL.md)
+- [todo SQL](./database/SQL.md)
 
 
 ### React
 
-- [Redux](./React/Redux.md)
+- [todo Redux](./React/Redux.md)
 
-- [Hooks](./React/Hooks.md)
+- [todo Hooks](./React/Hooks.md)
 
-- [React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
+- [todo React design patterns and best practices](./React/React_design_patterns_and_best_practices.md)
 
 ### IDE
 
@@ -53,22 +55,14 @@
 
 - [analytics](./front_end/analytics.md)
 
-- [browser rendering](./front_end/browser_rendering.md)
+- [todo browser rendering](./front_end/browser_rendering.md)
 
 
+### mathematics
 
-## todolist
+- [todo Gaussian Blur](./mathematics/Gaussian_Blur.md)
 
 
-- [mathematics](./Lisp/mathematics.md)
-
-- [Gaussian Blur](./mathematics/Gaussian_Blur.md)
-
-- [cache](./front_end/cache/cache_api.md)
-
-- 前端cache
-
-- 修改org格式为markdown格式
 
 ## 摘录SICP
 
@@ -91,4 +85,6 @@ Alan J. Perlis
 
 - 2019/4/21 新增todolist，尽量保持关注的连续性，不可东一榔头，西一棒槌
 
-- 2019/4/29 更细文章列表
+- 2019/4/29 更新文章列表
+
+- 2019/5/10 更新文章列表
