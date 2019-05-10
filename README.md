@@ -22,9 +22,11 @@
 
 - [todo comonad](./Lisp/comonad.md)
 
-### C++
+### C
 
-- [todo thread](./CPP/thread.md)
+- [todo thread](./C/thread.md)
+
+### C++
 
 ### backend development
 
