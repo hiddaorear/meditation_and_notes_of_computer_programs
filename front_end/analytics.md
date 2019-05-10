@@ -1,5 +1,11 @@
 # analytics
 
+## 前言
+
+稍微考察了一下，前端上报维度，发现很多指标，如PV，First Print等，都没有严格意义的定义，或没有严格意义上的在页面生命周期的时间点。如果是多个数据监测平台，就会出现同一个指标有较大偏差。同时，新的API的出现，使得监控更加精确和便捷。但我们搜索到资料，多数是时间较久远的技术实现，即使到今天，我依然发现监控的代码产用的是很有历史的实现。我不得不在这里强调一下本文整理的时间点：2019年5月10日，也许时间过了不久，又有新的前端API出现，本文的讨论和实现，也过期了。
+
+总体而言，前端性能的指标，与时间点密切相关，这是性能指标的关键。上报的实现，无外乎是实时上报，和离线存储之后批量上报，技术优化在两者之间权衡实现。监控系统的实现，最关键在于如何实现业务的唯一标识，需要考虑页面随业务的变化，标识能更新。
+
 ## 关键指标
 
 ### 用户唯一标识
@@ -48,18 +54,36 @@ SPA的PV统计问题可以用History API解决。
 document.addEventListener('visibilitychange', function () {
   // 用户离开了当前页面
   if (document.visibilityState === 'hidden') {
-    document.title = '页面不可见';
+    console.log('页面不可见');
   }
 
   // 用户打开或回到页面
   if (document.visibilityState === 'visible') {
-    document.title = '页面可见';
-    console.log("PV");
+    console.log("页面可见PV");
   }
 
 });
 
 ```
+
+PV的上报时机为什么时候合理呢？ 首次`document.visibilityState === 'visible'`与First Print的时间，哪一个更早呢？
+
+``` JavaScript
+let visibleTime = 0;
+if (document.visibilityState === 'visible') {
+    visibleTime  = performance.now();
+    console.log('页面可见', visibleTime);
+  }
+
+let loadTimes =  window.chrome.loadTimes();
+fpTime =  (loadTimes.firstPaintTime  -  loadTimes.startLoadTime) * 1000;
+console.log('fp: ', fpTime);
+console.log('diff: ', fpTime - visibleTime);
+```
+
+测试发现fp在PV之后，测试结果是`140.38ms`。到页面生命周期的哪一个时间点，算一次PV更合理呢？如果以`document.visibilityState === 'visible'`为标准，那么PV的时间点，比First
+Print还早，也就是页面是白屏，什么也没有渲染出来的，已经算了一次PV。如果是load事件触发了，算一次PV，时间显然太靠后了。比较合理是首屏加载完成，或者First Meaningful
+Print的时间点，用户已经浏览view页面了，算一次PV。这里需要看场景而定。
 
 当然，这个API也可以用来优化页面，暂停一些任务：动画，轮询，音视频。
 
@@ -567,6 +591,10 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 
 我们可以引入JS，允许打点的时候，执行一个JS函数，上报这个函数输出的结果即可。
 
+## 后记
+
+我没有料到，很多大家习以为常的技术名词，没有严格意义上的标准，导致了不同的技术实现。同时，提这些技术名词的人，很少关心这个技术名词，对应的技术实现，是否合理，是否正确，似乎是这领域的专家。稍加考察，就发现这里人云亦云的技术文章很多。本文也是，部分是对其他人文章的整理。也得益于这段时间，我工作闲暇很多，业务开发很少，可以有空去考察这些技术名词，背后的技术实现和定义。福耶？祸耶？
+
 ## 参考资料
 
 - 《现代前端技术解析》by 张成文
@@ -610,3 +638,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/5/8 晚上，补充离线日志
 
 - 2019/5/9 晚上，补充统计PV新API，和页面生命周期
+
+- 2019/5/10 晚上，完成此文。文章结构略凌乱，以后重写。
