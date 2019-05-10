@@ -14,6 +14,57 @@
 - 用途：统计关键页面或临时推广性页面的PV，考察访问量或推广效果； 作为单页面统计参数
 - 缺点：PV统计不做限制，可以人为的刷新页面提升数据，单纯看着PV无法反应页面被用户访问的具体情况
 
+#### 传统技术实现
+
+传统情况下Page View对应一次Page Load，即PV等于一次页面内加载。load事情触发的时候。
+
+``` JavaScript
+ window.addEventListener("load", function(event) {
+    console.log("All resources finished loading!");
+    console.log("PV");
+  });
+```
+
+但load事件不等同与PV，load是页面所有资源已经加载完成的事件，和用户浏览，显然是两个不同的概念。First Print的时候(如果严格一点，应该是First Meaningful Paint)，用户已经浏览页面了，此时load事件可能还没有触发。
+
+load作为PV缺点：
+
+- 页面打开超过一天，但用户在此期间都有使用。使用load只能统计到一次PV
+
+- SPA单页面应用中，页面内容一切换了，但不会重新触发load事件
+
+- 页面从后台运行状态，激活并查看
+
+根本问题在于view和load是两个不同的概念，load只能在某些情况下可以作为PV。
+
+#### 新技术实现
+
+SPA的PV统计问题可以用History API解决。
+
+而view这个动作，则可以用Page Visibility API来处理。
+
+``` JavaScript
+
+document.addEventListener('visibilitychange', function () {
+  // 用户离开了当前页面
+  if (document.visibilityState === 'hidden') {
+    document.title = '页面不可见';
+  }
+
+  // 用户打开或回到页面
+  if (document.visibilityState === 'visible') {
+    document.title = '页面可见';
+    console.log("PV");
+  }
+
+});
+
+```
+
+当然，这个API也可以用来优化页面，暂停一些任务：动画，轮询，音视频。
+
+
+
 ### UV(Unique Visitor)
 
 - 定义： 一天之内，不同的用户个数；同一个页面，同一天，同一个用户访问多次，只能算一次
@@ -30,6 +81,10 @@
 ### VV(Visit View)
 
 - 定义：用户从进入网站到离开，整个过程只算一次；针对整个网站的统计指标
+
+### 跳出率
+
+- 定义：跳出率指单页访问次数（即访问者从入口页离开网站而未与网页互动的访问次数）所占的百分比。
 
 
 ## 前端技术指标
@@ -98,8 +153,6 @@ navigationStart：当前浏览器窗口的前一个网页关闭，发生unload�
         <p>在头部资源加载完之前页面将是白屏</p>
     </body>
 </html>
-
-
 
 ```
 
@@ -184,6 +237,35 @@ console.log('首屏时间: ', flTime);
 | 京东 | `10.45 - 6.70` |
 | 头条 | `2.80 - 5.30` |
 
+## Page Lifecycle
+
+- 1. Active 阶段
+
+网页处于可见状态，且拥有输入焦点。
+
+- 2. Passive 阶段
+
+在 Passive 阶段，网页可见，但没有输入焦点，无法接受输入。
+
+UI 更新（比如动画）仍然在执行。该阶段只可能发生在桌面同时有多个窗口的情况。
+
+- 3. Hidden 阶段
+
+在 Hidden 阶段，用户的桌面被其他窗口占据，网页不可见，但尚未冻结。UI 更新不再执行。
+
+- 4. Terminated 阶段
+
+在 Terminated 阶段，由于用户主动关闭窗口，或者在同一个窗口前往其他页面，导致当前页面开始被浏览器卸载并从内存中清除。注意，这个阶段总是在 Hidden 阶段之后发生，也就是说，用户主动离开当前页面，总是先进入 Hidden 阶段，再进入 Terminated 阶段。
+
+- 5. Frozen 阶段
+
+如果网页处于 Hidden 阶段的时间过久，用户又不关闭网页，浏览器就有可能冻结网页，使其进入 Frozen 阶段。
+
+这个阶段的特征是，网页不会再被分配 CPU 计算资源。正在运行的任务会执行完，不在执行任务。
+
+- 6. Discarded 阶段
+
+如果网页长时间处于 Frozen 阶段，用户又不唤醒页面，那么就会进入 Discarded 阶段，即浏览器自动卸载网页，清除该网页的内存占用。不过，Passive 阶段的网页如果长时间没有互动，也可能直接进入 Discarded 阶段。
 
 ## HTML5 性能API
 
@@ -253,6 +335,8 @@ function firstPaintTime() {
 `window.performance.getEntriesByType('paint')`
 
 ### FMP(First Meaningful Paint)
+
+The time when the browser paints the content that users are interested in. This is highly depends on the page.
 
 ### DCL(DOMContentLoaded Event)
 
@@ -401,11 +485,20 @@ idleCallback(work);
 
 用户的行为日志和异常日志（崩溃），可以存储在离线数据中，如滚动，翻页，badjs等。
 
+### 离线日志的上传
+
 日志上传：
 
 - 有事件产生，调用日志记录，将离线日志上传到服务端。时效性好，但流量大，占用宽带，服务端压力大
 - 暂存在本地，达到一定量，网络允许的情况下，批量上传。时效性差；但占用宽带小，给服务的造成的压力小
 
+sendBeacon可以用于页面unload之前，上报数据。可用于页面关闭或跳转的时候，上报数据，避免数据丢失。
+
+``` JavaScript
+window.addEventListener('unload', function(event) {
+  navigator.sendBeacon('/collector', data);
+});
+```
 
 ## 技术注意事项
 
@@ -496,6 +589,12 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 
 - [网站统计那些事（四）：工程化，模块化与测试](https://afantasy.ninja/2017/05/08/user-tracking-iv/)
 
+- [为什么你统计 PV 的方式是错的？](https://zhuanlan.zhihu.com/p/26341409)
+
+- [页面跳转时，统计数据丢失问题探讨](http://taobaofed.org/blog/2016/04/01/lose-statistics/)
+
+- [Page Lifecycle API 教程](http://www.ruanyifeng.com/blog/2018/11/page_lifecycle_api.html)
+
 ## change log
 
 - 2019/4/22 created doc
@@ -509,3 +608,5 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - 2019/5/8 下午，补充首屏时间的测量的技术实现
 
 - 2019/5/8 晚上，补充离线日志
+
+- 2019/5/9 晚上，补充统计PV新API，和页面生命周期
