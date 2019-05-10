@@ -20,6 +20,18 @@
 
 - [comonad](./Lisp/comonad.md)
 
+### C++
+
+- [thread](./CPP/thread.md)
+
+### backend development
+
+- [koa](./backend_development/koa.md)
+
+### database
+
+- [SQL](./database/SQL.md)
+
 
 ### React
 
