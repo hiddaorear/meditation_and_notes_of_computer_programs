@@ -198,8 +198,18 @@ console.log('白屏时间: ', fpTime);
 | 百度 | `609.99 - 220.99` |
 | 淘宝 | `341.00 - 270.99` |
 | 京东 | `621.00 - 225.00` |
-| 头条 | `292.00 - 956.00` |
 
+
+### 用户可操作时间
+
+- 定义：默认可以认为是domready(即DOMContentLoaded)的时间。用户可以正常操作，如：点击，输入等
+- 标准: 无
+
+|站点  | 用户可操作时间 |
+| :------| :------: |
+| 百度 | `681 - 507` |
+| 淘宝 | `620 - 1.17` |
+| 京东 | `1050 - 497` |
 
 ### 首屏时间
 
@@ -226,25 +236,11 @@ flTime =  (loadTimes.finishLoadTime  -  loadTimes.startLoadTime) * 1000;
 console.log('首屏时间: ', flTime);
 ```
 
-|站点  | 白屏时间 |
+|站点  | 首屏时间 |
 | :------| :------: |
 | 百度 | `3891.00 - 1195.00` |
 | 淘宝 | `2388.99 - 3108.00` |
 | 京东 | `13382.99 - 48743.00` |
-| 头条 | `3102.99 - 1562.00` |
-
-
-### 用户可操作时间
-
-- 定义：默认可以认为是domready(即DOMContentLoaded)的时间。用户可以正常操作，如：点击，输入等
-- 标准: 无
-
-|站点  | 用户可操作时间 |
-| :------| :------: |
-| 百度 | `681 - 507` |
-| 淘宝 | `620 - 1.17` |
-| 京东 | `1050 - 497` |
-| 头条 | `759 - ` |
 
 
 ### 总下载时间
@@ -259,7 +255,6 @@ console.log('首屏时间: ', flTime);
 | 百度 | `4.13 - 1.29` |
 | 淘宝 | `2.93 - 1.89` |
 | 京东 | `10.45 - 6.70` |
-| 头条 | `2.80 - 5.30` |
 
 ## Page Lifecycle
 
@@ -396,21 +391,6 @@ document.addEventListener('DOMContentLoaded', function(){
 document.addEventListener('load', function(){
     console.log('load');
 });
-
-
-
-### PC版网站JS和CSS包大小(单位KB)
-
-PC版网站抽样(单位KB)
-
-|站点  | JS | CSS |
-| :------| :------: |:------: |
-| 淘宝 | 26.0  |0|
-| 京东  | 20.5  |2.9|
-| 头条(https://www.toutiao.com/) | 32.5  |32|
-
-
- 可以得出结论：一般站点的JS包为300KB左右，CSS为40KB上下浮动（偏差较大，与优化手段有关）
 
 ### 用户对性能的感知
 
@@ -611,18 +591,6 @@ Codeless Tracking俗称无埋点技术。相比在代码里手动硬编码埋点
 - [JS埋点技术分析](http://unclechen.github.io/2017/12/24/JS%E5%9F%8B%E7%82%B9%E6%8A%80%E6%9C%AF%E5%88%86%E6%9E%90/)
 
 - [神奇的Shadow DOM](https://aotu.io/notes/2016/06/24/Shadow-DOM/index.html)
-
-- [移动应用要如何埋点上传才能收集更多数据？ 离线日志](https://dbaplus.cn/news-73-633-1.html)
-
-- [打造前端离线日志(一): IndexedDB](https://juejin.im/post/5c91b3c86fb9a070cf6bcab2?utm_medium=hao.caibaojian.com&utm_source=hao.caibaojian.com#heading-1)
-
-- [网站统计那些事（一）：背景与基础概念](https://afantasy.ninja/2017/05/08/user-tracking-i/)
-
-- [网站统计那些事（二）：统计脚本实现（上） ](https://afantasy.ninja/2017/05/08/user-tracking-ii/)
-
-- [网站统计那些事（三）：统计脚本实现（下）](https://afantasy.ninja/2017/05/08/user-tracking-iii/)
-
-- [网站统计那些事（四）：工程化，模块化与测试](https://afantasy.ninja/2017/05/08/user-tracking-iv/)
 
 - [为什么你统计 PV 的方式是错的？](https://zhuanlan.zhihu.com/p/26341409)
 
