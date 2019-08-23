@@ -1,5 +1,56 @@
 # git
 
+## 回退的操作
+
+### 简单回退
+
+#### 修改错误的提交消息
+
+`git commit --amend`
+
+#### 修改错误的分支名
+
+`git branch -m wrong-branch right-branch`
+
+如果已推送到远程，先删除再推送。
+
+`git push origin --delete wrong-branch`
+
+`git push origin right-branch`
+
+#### 不小心在主分支修改
+
+已提交的情况下，先切换到新分支，然后回退主分支。
+
+依据当前分支新建分支：`git branch feature-branch`
+
+粗暴回退主分支：`git reset HEAD~ --hard`。缺点，主分支一般作为公共分支，此时其他人可能拉取代码了并修改了。这样回退本地之后，应该是不能正常push到远程的，需要`--force`。作为私有的个人分支，这样处理没问题。
+
+好一点的回退办法：`git revert HEAD~`。好处，不会重写历史，用在公共分支比较友好。
+
+
+## 常见问题
+
+### Windows和Linux文件行尾格式问题
+
+crlf 为win风格换行符，lf为unix风格。
+
+全局`git config --global core.autocrlf`
+
+项目内`git config --local core.autocrlf`
+
+`core.autocrlf = true/input/false`解释
+`core.autocrlf = true` 提交变为lf，checkout时变为crlf
+`core.autocrlf = input`提交变为lf，checkout时不变化
+`core.autocrlf = false` 都不变化
+
+如果你是windows电脑推荐用core.autocrlf = true，但是在ide的支持下，用 core.autocrlf = input 也可以让仓库保持干净
+
+### 对大小写不敏感
+
+修改文件的大小写之后，git不会感知。可以想办法绕过，如，project修改为project1，在修改为Project。
+
+
 ## 常用操作
 
 ## commit
@@ -68,7 +119,7 @@ The `-m` option specifies the parent number. This is because a merge commit has 
 
 When you view a merge commit in the output of git log, you will see its parents listed on the line that begins with Merge:
 
-```` shell
+``` shell
 
 commit 8f937c683929b08379097828c8a04350b9b8e183
 Merge: 8989ee0 7c6b236
@@ -80,20 +131,20 @@ Merge branch 'gh-pages'
 Conflicts:
     README
 
-````
+```
 
 In this situation, `git revert 8f937c6 -m 1` will get you the tree as it was in `8989ee0`, and git revert `-m` 2 will reinstate the tree as it was in `7c6b236`.
 
 To better understand the parent IDs, you can run:
 
-```` shell
+``` shell
 git log 8989ee0
-````
+```
 and
 
-```` shell
+``` shell
 git log 7c6b236
-````
+```
 
 ## search
 
