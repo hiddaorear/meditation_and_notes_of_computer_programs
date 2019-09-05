@@ -1,4 +1,42 @@
 * setState
+** setState特点
+*** setState可能不会立即改变React组件中的值
+*** setState通过引发一次组件更新过程来引发重新渲染
+*** 多次setState函数调用的效果会合并
+** setState
+*** 不会立即改变React组件的state的值
+#+BEGIN_SRC js
+
+function incrementMultiple() {
+  this.setState({count: this.state.count + 1});
+  this.setState({count: this.state.count + 1});
+  this.setState({count: this.state.count + 1});
+}
+
+#+END_SRC
+这个incrementMultiple函数被调用是，count增加了3次，但实际结果只给state增加了1.因为在调用this.setState的时候，没有立即更新this.state，所以是在旧的值上反复设置而已。
+
+可以在setState中传入一个函数来避免这个问题。函数调用的时候，React会保证合并之前的状态修改结果，this.state的值并没有改变，还是要等到render函数重新指向。
+*** 通过引发一次组件的更新过程来引发重新渲染
+如果shouldComponentUpdate返回false，或者返回true，直到下一次render函数调用时，才更新this.state。
+setState与React生命周期息息相关
+*** 多次setState函数调用的效果会合并
+#+BEGIN_SRC js
+function updateName() {
+   this.setState({firstName: 'first'});
+   this.setState({lastName: 'last'});
+}
+#+END_SRC
+等价于：
+#+BEGIN_SRC javascript
+  function updateName() {
+     this.setState({
+        firstName: 'first', 
+        lastName: 'last'
+    });
+  }
+#+END_SRC
+
 ** setState是同步还是异步？
 *** 既不是同步也不是异步，官方回复：
 setState() does not always immediately update the component. It may batch or defer the update until later. 
@@ -14,28 +52,11 @@ Honestly, the current batching strategy comes with a set of problems right now. 
 I think of it as a temporary escape until we figure out something better.
 即问题的根源在于batching策略。在batching策略调整之前，盲目扩充setState接口是短视的。
 这里也会带来性能问题，所有setState都产生一个callback，需要存储，在合理的事件触发
-** setState
-*** 不会立即改变React组件的state的值
-#+BEGIN_SRC js
-
-function incrementMultiple() {
-  this.setState({count: this.state.count + 1});
-  this.setState({count: this.state.count + 1});
-  this.setState({count: this.state.count + 1});
-}
-
-#+END_SRC
-    这个incrementMultiple函数被调用是，count增加了3次，但实际结果只给state增加了1.因为在调用this.setState的时候，没有立即更新this.state，所以是在旧的值上反复设置而已。
-    
-    可以在setState中传入一个函数来避免这个问题。函数调用的时候，React会保证合并之前的状态修改结果，this.state的值并没有改变，还是要等到render函数重新指向。
-*** 通过引发一次组件的更新过程来引发重新渲染
-    如果shouldComponentUpdate返回false，或者返回true，直到下一次render函数调用时，才更新this.state。
-    setState与React生命周期息息相关
-*** 多次setState函数调用的效果会合并
 ** 为什么不设计成直接修改this.state就更新？
 如果通过Object的setter功能，通过对this.state对象的直接修改来实现setState一样的功能，容易出现问题，就是我们修改了一个this.state对象居然会引发重新渲染的副作用。
 所以设计setState这个API较为合理。函数式编程的思想，让开发者写出无副作用的函数。setState不修改组件的状态，而是把状态给React，状态维护给React处理。
 ** setState为什么不能设计成同步的，或异步的？
+*** 不能设计为同步
 如果setState调用返回，即可更新，会导致每一次setState更新组件，很浪费。同时，组件更新有四个生命周期：
 
 shouldComponentUpdate
@@ -47,5 +68,9 @@ render
 componentDidUpdate
 
 每次setState调用都走一圈生命周期。在shouldComponentUpdate中，函数有两个参数，nextProps和nextState，当前的设计，shouldComponentUpdate调用的时候，state并没有改变。
-这个设计导致setState也不能设计异步触发组件更新。如果setState返回式，this.state值已经修改了，但没有立即引发更新过程，React把setState的结果放在异步队列里，等到时机成熟了才更新。
+state的修改时机只能是在componentWillUpdate和render函数之间。
+
+
+*** 不能设计为异步
+这个设计导致setState也不能设计异步触发组件更新。如果setState返回了，this.state值已经修改了，但没有立即引发更新过程，React把setState的结果放在异步队列里，等到时机成熟了才更新。React的state批处理与副作用相关，而副作用与生命周期息息相关。
 还是以上生命周期的原因，因为shouldComponentUpdate和componentWillUpdate是假设this.state没有改变的。
