@@ -81,12 +81,6 @@
 
 ## 技术主题
 
-### 数据库
-
-- 第四范式
-- group by and right join and left join
-- 笛卡尔积
-
 ### 并发
 
 #### 锁
