@@ -99,6 +99,10 @@ master...`注意是三个点。与两个点的区别：基于master新建分支a
 
 `git diff --name-status HEAD~2 HEAD~3`
 
+### todo 对比历史commit
+
+当出问题的时候，对比历史代码，看看是那些diff引起的。
+
 ## 回退
 
 ### revert
