@@ -14,6 +14,8 @@ JavaScript函数式编程的现状和未来？实话说各种编程开发应用�
 
 ## 参考资料
 
+- [Streams vs monads](https://stackoverflow.com/questions/10489584/streams-vs-monads)
+
 - [前端开发js函数式编程真实用途体现在哪里？](https://www.zhihu.com/question/59871249)
 
 - [函数式编程在Redux/React中的应用](https://tech.meituan.com/2017/10/12/functional-programming-in-redux.html)

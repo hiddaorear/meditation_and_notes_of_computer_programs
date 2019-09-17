@@ -4,6 +4,14 @@
 
 > 如果你对知识进行了彻底的分析而非某种机械的套弄，在你脑中生成的概念与生硬的文字之间已经没有很强的相似性，我们就认为这个概念是被理解的。 彻底的分析和非凡的变换，是获得真知的标志性特征。
 
+## 技术跟踪
+
+- TS
+- nestjs
+- rabbitMQ
+- Swagger
+
+
 ## 文档
 
 ### Lisp
@@ -36,6 +44,10 @@
 
 - [todo SQL](./database/SQL.md)
 
+### concurrency
+
+- [lock](./concurrency/lock.md)
+
 
 ### React
 
@@ -59,10 +71,42 @@
 
 - [todo browser rendering](./front_end/browser_rendering.md)
 
+- [todo 前端表单校验的设计](./front_end/form_validation.md)
+
+### design patterns
+
+- [MVC](./design_patterns/MVC.md)
+
+- [observer and pub sub pattern](./design_patterns/observer_and_pub_sub_pattern.md)
+
+- [reactor](./design_patterns/reactor.org)
+
 
 ### mathematics
 
 - [todo Gaussian Blur](./mathematics/Gaussian_Blur.md)
+
+### engineering
+
+- [代码圈复杂度](./engineering/cyclomatic_complexity.md)
+
+
+## 技术主题
+
+### 数据结构
+
+- hashmap的实现
+
+### 计算机基础
+
+- 多进程
+- 多线程
+- 状态同步
+
+### 日常经验
+
+- 后台如何生成唯一id
+- 如何生成不递增的唯一id
 
 
 
@@ -90,3 +134,7 @@ Alan J. Perlis
 - 2019/4/29 更新文章列表
 
 - 2019/5/10 更新文章列表
+
+- 2019/8/20 新增技术主题
+
+- 2019/8/28 新增并发文档
