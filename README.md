@@ -44,6 +44,10 @@
 
 - [todo SQL](./database/SQL.md)
 
+### concurrency
+
+- [lock](./concurrency/lock.md)
+
 
 ### React
 
@@ -89,14 +93,6 @@
 
 ## 技术主题
 
-### 并发
-
-#### 锁
-
-- 自旋锁
-- 乐观锁
-- 悲观锁
-
 ### 数据结构
 
 - hashmap的实现
@@ -140,3 +136,5 @@ Alan J. Perlis
 - 2019/5/10 更新文章列表
 
 - 2019/8/20 新增技术主题
+
+- 2019/8/28 新增并发文档
