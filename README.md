@@ -69,6 +69,14 @@
 
 - [todo 前端表单校验的设计](./front_end/form_validation.md)
 
+### design patterns
+
+- [MVC](./design_patterns/MVC.md)
+
+- [observer and pub sub pattern](./design_patterns/observer_and_pub_sub_pattern.md)
+
+- [reactor](./design_patterns/reactor.org)
+
 
 ### mathematics
 
