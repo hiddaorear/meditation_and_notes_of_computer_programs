@@ -6,7 +6,7 @@
   - [Observer模式](#Observer模式)
   - [Composite模式](#Composite模式)
   - [Strategy模式](#Strategy模式)
-  - [Factory Metchod](#Factory Metchod)
+  - [Factory-Metchod](#Factory-Metchod)
   - [Decorator模式](#Decorator模式)
 - [在用React开发时的相关模式](#在用React开发时的相关模式)
   - [哑组件概念与View的复用以及Composite](#哑组件概念与View的复用以及Composite)
@@ -14,7 +14,15 @@
   - [Decorator模式与高阶组件](#Decorator模式与高阶组件)
   - [VM与Observer模式](#VM与Observer模式)
 - [发展](#发展)
-  - [Flux-Redux](#Flux-Redux)
+  - [后台MVC与前端MVC区别](#后台MVC与前端MVC区别)
+    - [后台MVC](#后台MVC)
+    - [前端MVC](#前端MVC)
+  - [MVC-MVP-MVVM](#MVC-MVP-MVVM)
+    - [MVP到MVVM](#MVP到MVVM)
+    - [MVVM中的依赖倒置(DI)](#MVVM中的依赖倒置(DI))
+  - [Redux](#Redux)
+    - [优点](#优点)
+    - [单一store的好处](#单一store的好处)
 - [延伸](#延伸)
   - [multi-method与Visitor](#multi-method与Visitor)
 - [参考资料](#参考资料)
@@ -59,7 +67,7 @@ M和V的分离的设计，需要实现M的改变，能够影响V，而M并不需
 
 ### Strategy模式
 
-### Factory Metchod
+### Factory-Metchod
 
 指定视图缺省控制器
 
