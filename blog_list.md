@@ -2,6 +2,8 @@
 
 ## 编程
 
+- [千里冰封博客](https://ice1000.org/cn/)
+
 - [Hux Blog: 黄玄](https://huangxuan.me/)
 
 - [Surely I Am Joking: 王垠英文blog](https://yinwang0.wordpress.com/)
