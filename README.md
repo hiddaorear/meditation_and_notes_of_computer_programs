@@ -81,6 +81,10 @@
 
 - [reactor](./design_patterns/reactor.org)
 
+- [todo visitor](./design_patterns/visitor.md)
+
+- [todo interperter](./design_patterns/interperter.md)
+
 
 ### mathematics
 

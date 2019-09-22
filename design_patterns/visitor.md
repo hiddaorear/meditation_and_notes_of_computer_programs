@@ -9,6 +9,8 @@
 
 ## 参考资料
 
+- [编程的宗派](https://www.yinwang.org/blog-cn/2015/04/03/paradigms)
+
 - [解密“设计模式”](https://www.yinwang.org/blog-cn/2013/03/07/design-patterns)
 
 - [OOP vs FP：用 Visitor 模式克服 OOP 的局限](http://mxm.ink/post/2018-07-31-oop-vs-fp/)
