@@ -83,7 +83,7 @@
 
 - [todo visitor](./design_patterns/visitor.md)
 
-- [todo interperter](./design_patterns/interperter.md)
+- [todo interpreter](./design_patterns/interpreter.md)
 
 
 ### mathematics
@@ -142,3 +142,5 @@ Alan J. Perlis
 - 2019/8/20 新增技术主题
 
 - 2019/8/28 新增并发文档
+
+- 2019/9/22 新增设计模式
