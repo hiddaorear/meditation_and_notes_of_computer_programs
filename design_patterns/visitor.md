@@ -1,5 +1,14 @@
 # visitor
 
+> 密涅瓦的猫头鹰，只有在黄昏的时候才起飞
+-- 黑格尔
+
+> visitor，本质上是函数式编程语言里的含有“模式匹配pattern matching”的递归函数。
+-- 王垠
+
+> Java没有模式匹配，所以很多需要类似功能的人就得使用visitor pattern。为了所谓的“通用性”，他们往往把visitor pattern搞出多层继承关系，让你转几弯也搞不清楚到底哪个visitor才是干实事的。
+-- 王垠
+
 ## OCaml
 
 ## Java
