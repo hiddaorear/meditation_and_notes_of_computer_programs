@@ -15,3 +15,5 @@
 - [有数学理想的程序员](https://hmgle.github.io/misc/2016/04/04/random-thought.html)
 
 - [子龙山人](https://zilongshanren.com/post/2015-11-23-a-few-good-habit-i-keep-for-years/)
+
+- [刘未鹏 Mind Hacks 思维改变生活](http://mindhacks.cn/)
