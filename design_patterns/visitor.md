@@ -30,7 +30,7 @@
 
 - [Visitor Pattern](https://zhuanlan.zhihu.com/p/35987864)
 
-- [A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
+- [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
 
 - [子龙山人《a little java a few patterns》读书笔记](https://zilongshanren.com/post/a-little-java-a-few-patterns-book-review/)
 
