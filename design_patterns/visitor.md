@@ -102,6 +102,12 @@ extends 将以上两者联系起来
 
 - [Visitor Pattern 与 Finally Tagless：解决表达式问题](https://ice1000.org/2019/01/01/FinallyTaglessVisitorPattern/)
 
+- [From Object Algebras to Finally Tagless Interpreters](https://oleksandrmanzyuk.wordpress.com/2014/06/18/from-object-algebras-to-finally-tagless-interpreters-2/?nally-tagless-interpreters-2%2F)
+
+- [Learn X in Y minutes Where X=OCam](https://learnxinyminutes.com/docs/ocaml/)
+
+- [OCaml数据类型和匹配](https://ocaml.org/learn/tutorials/data_types_and_matching.zh.html)
+
 ## change log
 
 - 2019/9/20 created doc
