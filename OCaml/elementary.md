@@ -31,6 +31,11 @@ open Core;;
 
 在utop中使用Core，不能直接用`open Core.std;;`引入，会报错。要先`#require "core";;`
 
+## 参考资料
+
+- [99 Problems (solved) in OCaml](https://ocaml.org/learn/tutorials/99problems.html)
+
+
 ## change log
 
 - 2019/9/21 created doc

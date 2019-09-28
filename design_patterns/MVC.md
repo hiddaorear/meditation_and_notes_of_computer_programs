@@ -184,11 +184,7 @@ CLOS支持多方法(multi-method)的概念，这就减少了Visitor模式的必�
 
 - [如何理解 Facebook 的 flux 应用架构？](https://www.zhihu.com/question/33864532)
 
-- [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/index.html)
 
-- [wiki 访问者模式](https://zh.wikipedia.org/wiki/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F)
-
-- [Visitor Pattern](https://zhuanlan.zhihu.com/p/35987864)
 
 ## change log
 
