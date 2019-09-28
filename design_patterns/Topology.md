@@ -14,6 +14,10 @@
 
 -- 灵剑
 
+## 参考资料
+
+- [拓扑学简介（一）](https://songshuhui.net/archives/1633)
+
 ## change log
 
 - 2019/9/25 created doc

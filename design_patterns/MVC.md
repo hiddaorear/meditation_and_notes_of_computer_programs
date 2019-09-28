@@ -172,6 +172,8 @@ CLOS支持多方法(multi-method)的概念，这就减少了Visitor模式的必�
 
 ## 参考资料
 
+- [MVC 框架的映射和解耦](https://www.raychase.net/850)
+
 - [wiki MVC](https://zh.wikipedia.org/wiki/MVC)
 
 - [Scaling Isomorphic Javascript Code](https://blog.nodejitsu.com/scaling-isomorphic-javascript-code/)
