@@ -35,6 +35,38 @@ open Core;;
 
 - [99 Problems (solved) in OCaml](https://ocaml.org/learn/tutorials/99problems.html)
 
+## 学习过程中遇到的问题
+
+### How to read/understand this part: `type a . a term -> a`?
+
+ `a .` apparently means ∀a
+
+ - [How to read/understand function signature with GADT?](https://discuss.ocaml.org/t/how-to-read-understand-function-signature-with-gadt/2250)
+
+
+### Extending an existing type in OCaml
+
+- [Reuse and extend the defined type in Ocaml](https://stackoverflow.com/questions/6881652/reuse-and-extend-the-defined-type-in-ocaml)
+
+- [What is the “right” way to add constraints on a type, to handle recursive structures with variants and to combine fragments of types?](https://discuss.ocaml.org/t/what-is-the-right-way-to-add-constraints-on-a-type-to-handle-recursive-structures-with-variants-and-to-combine-fragments-of-types/2810)
+
+- [Extending an existing type in OCaml](https://stackoverflow.com/questions/1746743/extending-an-existing-type-in-ocaml)
+
+- [Defining a type for lambda expressions in Ocaml](https://stackoverflow.com/questions/7369615/defining-a-type-for-lambda-expressions-in-ocaml)
+
+### GADT
+
+- [Detecting use-cases for GADTs in OCaml](https://mads-hartmann.com/ocaml/2015/01/05/gadt-ocaml.html)
+
+- [什么是GADT？它有什么作用？](https://www.zhihu.com/question/67043774)
+
+- [Generalized algebraic datatypes](https://caml.inria.fr/pub/docs/manual-ocaml/manual033.html)
+
+- [GADTs: Wizardry for a Typesafe Age](https://dttw.tech/posts/SkHN2ZlEG)
+
+ - [An concrete simple example to demonstrate GADT in OCaml?](https://stackoverflow.com/questions/27864200/an-concrete-simple-example-to-demonstrate-gadt-in-ocaml)
+
+
 
 ## change log
 
