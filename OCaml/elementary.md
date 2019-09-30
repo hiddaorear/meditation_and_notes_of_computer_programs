@@ -46,6 +46,12 @@ open Core;;
 
 ## 参考资料
 
+### 书籍
+
+- [realworldocaml.org](https://dev.realworldocaml.org/variants.html)
+
+### 练习
+
 - [99 Problems (solved) in OCaml](https://ocaml.org/learn/tutorials/99problems.html)
 
 ## 学习过程中遇到的问题
