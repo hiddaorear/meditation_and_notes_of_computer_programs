@@ -137,4 +137,5 @@ extends 将以上两者联系起来
 ## change log
 
 - 2019/9/20 created doc
-- 2019/922 补充参考资料
+- 2019/9/22 补充参考资料
+- 2019/9/30 完成OCaml版本的Finally Tagless的版本理解，可以开始写OCaml部分了

@@ -85,6 +85,9 @@
 
 - [todo interpreter](./design_patterns/interpreter.md)
 
+### OCaml
+
+- [elementary](./OCaml/elementary.md)
 
 ### mathematics
 

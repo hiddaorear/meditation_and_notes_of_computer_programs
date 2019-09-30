@@ -90,3 +90,4 @@ open Core;;
 ## change log
 
 - 2019/9/21 created doc
+- 2019/9/30 完成variants的学习
