@@ -31,6 +31,19 @@ open Core;;
 
 在utop中使用Core，不能直接用`open Core.std;;`引入，会报错。要先`#require "core";;`
 
+形如`List.for_all exprs ~f:eval`即是使用了Core，需要引入Core。
+
+## 操作符
+
+`<>` is to `=` (structural equality) as `!=` is to `==` (physical equality)
+
+``` OCaml
+
+"odg" = "odg"  (* true  *)
+"odg" == "odg" (* false *)
+
+```
+
 ## 参考资料
 
 - [99 Problems (solved) in OCaml](https://ocaml.org/learn/tutorials/99problems.html)
