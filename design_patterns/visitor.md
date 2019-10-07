@@ -100,11 +100,6 @@ extends 将以上两者联系起来
 
 - [Visitor Pattern](https://zhuanlan.zhihu.com/p/35987864)
 
-- [Visitor Pattern 与 Finally Tagless：解决表达式问题](https://ice1000.org/2019/01/01/FinallyTaglessVisitorPattern/)
-
-- [wiki 访问者模式](https://zh.wikipedia.org/wiki/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F)
-
-- [Visitor Pattern](https://zhuanlan.zhihu.com/p/35987864)
 
 ### A Little Java, A Few Patterns》笔记
 
