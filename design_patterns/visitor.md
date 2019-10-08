@@ -90,6 +90,14 @@ extends 将以上两者联系起来
 
 - [解密“设计模式”](https://www.yinwang.org/blog-cn/2013/03/07/design-patterns)
 
+### algebraic data types
+
+- [学舌文：代数，类型和Zipper](https://yi-programmer.com/2011-05-22_explain-algebraic-data-type.html)
+
+- [Very Simple Algebraic Data Types](http://ariwaranosai.xyz/2015/12/29/VSADT/)
+
+- [代数数据类型是什么？](https://zhihu.com/question/24460419)
+
 ### Visitor Pattern and Finally Tagless
 
 - [OOP vs FP：用 Visitor 模式克服 OOP 的局限](http://mxm.ink/post/2018-07-31-oop-vs-fp/)
@@ -102,8 +110,7 @@ extends 将以上两者联系起来
 
 
 ### A Little Java, A Few Patterns》笔记
-
-- [A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
+- [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
 
 - [子龙山人《a little java a few patterns》读书笔记](https://zilongshanren.com/post/a-little-java-a-few-patterns-book-review/)
 
