@@ -118,6 +118,10 @@ extends 将以上两者联系起来
 
 ### Expression problem
 
+- [The expression problem as a litmus test](http://ane.github.io/2016/01/08/the-expression-problem-as-a-litmus-test.html)
+
+- [expression_problem_1.ml](https://github.com/rizo/lambda-lab/blob/master/expression-problem/ocaml/expression_problem_1.ml)
+
 - [Expression problem](https://en.wikipedia.org/wiki/Expression_problem)
 
 - [Extending an existing type in OCaml](https://stackoverflow.com/questions/1746743/extending-an-existing-type-in-ocaml)
@@ -139,5 +143,9 @@ extends 将以上两者联系起来
 ## change log
 
 - 2019/9/20 created doc
+
 - 2019/9/22 补充参考资料
+
 - 2019/9/30 完成OCaml版本的Finally Tagless的版本理解，可以开始写OCaml部分了
+
+- 2019/10/11 完成OCaml的expression problem例子，补充参考资料
