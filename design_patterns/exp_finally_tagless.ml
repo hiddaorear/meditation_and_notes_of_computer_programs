@@ -25,9 +25,10 @@ let rec new_eval e =
   match e with
   | #exp as exp -> eval exp
   | `Sub(e1, e2) -> (match (new_eval e1, new_eval e2) with
-                     | (`Int i, `Int j) -> `Int (i - j))
+                     | (`Int i, `Int j) -> `Int (i - j)
+                     | _ -> raise (BadResult "non-ints in sub"))
 
-let rec new_toString  = function
+let rec new_toString : new_exp -> string = function
   | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
   | #exp as exp -> toString exp
 
@@ -36,7 +37,8 @@ let rec new_toString  = function
 let a = `Int 7
 let b = `Int 6
 let c = `Sub(a, b)
-let d = new_eval c
+let d = new_eval c;;
 
-let res = new_toString d;;
+let res = toString d;;
+print_endline (new_toString c);;
 print_endline res;;
