@@ -25,10 +25,7 @@ let rec new_eval e =
   match e with
   | #exp as exp -> eval exp
   | `Sub(e1, e2) -> (match (new_eval e1, new_eval e2) with
-                     | (`Int i, `Int j) -> `Int (i - j)
-                     | (`Int i, `Negate j) -> (new_eval (i, j))
-                     | (`Negate i, `Negate j) -> new_eval i j
-                     | (`Negate i, j) -> new_eval i j)
+                     | (`Int i, `Int j) -> `Int (i - j))
 
 let rec new_toString  = function
   | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
