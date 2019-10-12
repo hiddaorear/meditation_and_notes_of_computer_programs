@@ -90,6 +90,18 @@ extends 将以上两者联系起来
 
 - [解密“设计模式”](https://www.yinwang.org/blog-cn/2013/03/07/design-patterns)
 
+- [OCaml: Match expression inside another one?](https://stackoverflow.com/questions/257605/ocaml-match-expression-inside-another-one)
+
+### Algebraic Effects
+
+- [Algebraic Effects 是什么鬼](https://thzt.github.io/2019/02/26/algebraic-effects/)
+
+- [写给那些搞不懂代数效应的我们（翻译）](https://zhuanlan.zhihu.com/p/76158581)
+
+- [C++黑魔法滥用指南（二）-- 模拟Algebraic Effects](https://zhuanlan.zhihu.com/p/77139441)
+
+- [函数式编程中的 algebraic effects 是什么？](https://www.zhihu.com/question/300095154)
+
 ### algebraic data types
 
 - [学舌文：代数，类型和Zipper](https://yi-programmer.com/2011-05-22_explain-algebraic-data-type.html)
@@ -99,6 +111,8 @@ extends 将以上两者联系起来
 - [代数数据类型是什么？](https://zhihu.com/question/24460419)
 
 ### Visitor Pattern and Finally Tagless
+
+- [完全放弃ADT和record，拥抱polymorphic variant和row是否可行？](https://www.zhihu.com/question/310754155)
 
 - [OOP vs FP：用 Visitor 模式克服 OOP 的局限](http://mxm.ink/post/2018-07-31-oop-vs-fp/)
 
@@ -110,13 +124,17 @@ extends 将以上两者联系起来
 
 
 ### A Little Java, A Few Patterns》笔记
+
 - [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
 
 - [子龙山人《a little java a few patterns》读书笔记](https://zilongshanren.com/post/a-little-java-a-few-patterns-book-review/)
 
 
-
 ### Expression problem
+
+- [Expression Problem的现状如何？](https://www.zhihu.com/question/314310650)
+
+- [Extensibility for the Masses Practical Extensibility with Object Algebras](https://www.cs.utexas.edu/~wcook/Drafts/2012/ecoop2012.pdf)
 
 - [The expression problem as a litmus test](http://ane.github.io/2016/01/08/the-expression-problem-as-a-litmus-test.html)
 
@@ -149,3 +167,5 @@ extends 将以上两者联系起来
 - 2019/9/30 完成OCaml版本的Finally Tagless的版本理解，可以开始写OCaml部分了
 
 - 2019/10/11 完成OCaml的expression problem例子，补充参考资料
+
+- 2019/10/12 完成正确的OCaml的expression problem的实现，直接参考别人的博客写代码，被坑了半个月。也是由于我对OCaml不熟悉，加上心急，被这个博客的作者气死了，瞎写代码。
