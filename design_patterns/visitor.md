@@ -9,11 +9,49 @@
 > Java没有模式匹配，所以很多需要类似功能的人就得使用visitor pattern。为了所谓的“通用性”，他们往往把visitor pattern搞出多层继承关系，让你转几弯也搞不清楚到底哪个visitor才是干实事的。
 -- 王垠
 
+## expresssion problem
+
+### 纵
+
+### 横
+
+### 矩阵
+
 ## OCaml
+
+### DSL
+
+### polymorphic variant
 
 ## Java
 
+### Visitor Pattern
+
+### Object Algebras
+
 ## JavaScript
+
+### visitor pattern
+
+动态类型语言，无约束。call，apply随意修改this，调用其他对方的方法。
+
+### `Array.prototype.slice.call`
+
+slice方法的，只要有length属性就行。
+
+``` js
+let a  = Array.prototype.slice.call({a: 1, b: 2, c: 3, length: 3});
+// [empty × 3]
+
+let b  = Array.prototype.slice.call({0: 1, 1: 2, 2: 3, length: 3});
+// [1, 2, 3]
+```
+
+习惯用法：
+
+- `Array.prototype.slice.call(arguments, 1);`
+
+- `Array.prototype.slice.call(document.childNodes);`
 
 ## 完整代码
 
