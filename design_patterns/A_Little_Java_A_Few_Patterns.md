@@ -70,6 +70,8 @@ extends 将以上两者联系起来
 
 ## 参考资料
 
+- [A Little Java, A Few Patterns](A Little Java, a Few Patterns [Felleisen & Friedman 1997-12-19].pdf)
+
 - [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
 
 - [子龙山人《a little java a few patterns》读书笔记](https://zilongshanren.com/post/a-little-java-a-few-patterns-book-review/)
