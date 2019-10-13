@@ -4,6 +4,10 @@
 
 ## 参考资料
 
+- [F-Algebras](https://bartoszmilewski.com/2017/02/28/f-algebras/)
+
+- [Simple Algebraic Data Types](https://bartoszmilewski.com/2015/01/13/simple-algebraic-data-types/)
+
 - [学舌文：代数，类型和Zipper](https://yi-programmer.com/2011-05-22_explain-algebraic-data-type.html)
 
 - [Very Simple Algebraic Data Types](http://ariwaranosai.xyz/2015/12/29/VSADT/)
