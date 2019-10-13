@@ -92,24 +92,6 @@ extends 将以上两者联系起来
 
 - [OCaml: Match expression inside another one?](https://stackoverflow.com/questions/257605/ocaml-match-expression-inside-another-one)
 
-### Algebraic Effects
-
-- [Algebraic Effects 是什么鬼](https://thzt.github.io/2019/02/26/algebraic-effects/)
-
-- [写给那些搞不懂代数效应的我们（翻译）](https://zhuanlan.zhihu.com/p/76158581)
-
-- [C++黑魔法滥用指南（二）-- 模拟Algebraic Effects](https://zhuanlan.zhihu.com/p/77139441)
-
-- [函数式编程中的 algebraic effects 是什么？](https://www.zhihu.com/question/300095154)
-
-### algebraic data types
-
-- [学舌文：代数，类型和Zipper](https://yi-programmer.com/2011-05-22_explain-algebraic-data-type.html)
-
-- [Very Simple Algebraic Data Types](http://ariwaranosai.xyz/2015/12/29/VSADT/)
-
-- [代数数据类型是什么？](https://zhihu.com/question/24460419)
-
 ### Visitor Pattern and Finally Tagless
 
 - [完全放弃ADT和record，拥抱polymorphic variant和row是否可行？](https://www.zhihu.com/question/310754155)
@@ -123,7 +105,7 @@ extends 将以上两者联系起来
 - [Visitor Pattern](https://zhuanlan.zhihu.com/p/35987864)
 
 
-### A Little Java, A Few Patterns》笔记
+### 《 A Little Java, A Few Patterns》笔记
 
 - [《A Little Java, A Few Patterns》笔记](https://a-little-java-a-few-patterns.readthedocs.io/zh_CN/latest/foreword.html)
 
@@ -145,18 +127,6 @@ extends 将以上两者联系起来
 - [Extending an existing type in OCaml](https://stackoverflow.com/questions/1746743/extending-an-existing-type-in-ocaml)
 
 - [Expression problem Code](http://caml.inria.fr/cgi-bin/viewvc.cgi/ocaml/trunk/testlabl/mixin.ml?diff_format=c&view=markup&pathrev=10238)
-
-### reuse type
-
-- [What is the “right” way to add constraints on a type, to handle recursive structures with variants and to combine fragments of types?](https://discuss.ocaml.org/t/what-is-the-right-way-to-add-constraints-on-a-type-to-handle-recursive-structures-with-variants-and-to-combine-fragments-of-types/2810/2)
-
-- [Reuse and extend the defined type in Ocaml](https://stackoverflow.com/questions/6881652/reuse-and-extend-the-defined-type-in-ocaml)
-
-- [From Object Algebras to Finally Tagless Interpreters](https://oleksandrmanzyuk.wordpress.com/2014/06/18/from-object-algebras-to-finally-tagless-interpreters-2/?nally-tagless-interpreters-2%2F)
-
-- [Learn X in Y minutes Where X=OCam](https://learnxinyminutes.com/docs/ocaml/)
-
-- [OCaml数据类型和匹配](https://ocaml.org/learn/tutorials/data_types_and_matching.zh.html)
 
 ## change log
 
