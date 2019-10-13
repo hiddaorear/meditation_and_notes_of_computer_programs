@@ -15,6 +15,241 @@
 
 ## JavaScript
 
+## 完整代码
+
+### OCaml Expression Problem
+
+``` OCaml
+
+```
+
+### OCaml polymorphic variant
+
+``` OCaml
+
+exception BadResult of string
+
+type exp =
+  [`Int of int
+  | `Negate of exp
+  | `Add of exp * exp]
+
+let rec eval  = function
+  | `Int i -> i
+  | `Negate e ->  -(eval e)
+  | `Add(e1, e2) -> (eval e1 ) + (eval e2)
+
+let rec toString = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+
+type new_exp = [ exp | `Sub of new_exp * new_exp]
+
+let rec new_eval : new_exp -> int = function
+  | #exp as exp -> eval exp
+  | `Sub(e1, e2) -> (new_eval e1) - (new_eval e2)
+
+let rec new_toString : new_exp -> string = function
+  | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
+  | #exp as exp -> toString exp
+
+;;
+
+let a = `Int 10
+let b = `Int 6
+let c = `Sub(a, b)
+let d = new_eval c
+;;
+print_endline (string_of_int d);;
+
+let res = toString (`Add ((`Negate (`Int 5)), (`Int 6)));;
+let num = eval (`Add ((`Negate (`Int 5)), (`Int 6)));;
+print_endline res;;
+print_endline (string_of_int num);;
+
+```
+
+### Java Visitor pattern
+
+``` Java
+
+package siegel.visitor;
+
+public class VisitorPattern {
+    public static void main(String[] args) {
+        System.out.println("nice!");
+        Exp exp1 = new Add(new Literal(1), new Literal(2));
+        int res = exp1.accept(new ExpEvalVisitor());
+        String show = exp1.accept(new ExpShowVisitor());
+        System.out.println("eval reslut:" + res);
+        System.out.println("show reslut:" + show);
+
+
+        Exp exp2 = new Add(new Literal(2), new Literal(2));
+        Exp2 exp3 = new Divide(exp1, exp2);
+        int res4 = exp3.accept(new ExpEvalVisitor2());
+        System.out.println("divide eval reslut:" + res4);
+    }
+}
+
+
+interface Exp {
+    <T> T accept(ExpVisitor<T> visitor);
+}
+
+interface ExpVisitor<T> {
+    public T forLiteral(int v);
+    public T forAdd(Exp a, Exp b);
+}
+
+
+class Literal implements Exp {
+    public final int val;
+
+    public Literal(int val) {
+        this.val = val;
+    }
+
+    public <T> T accept(ExpVisitor<T> visitor) {
+        return visitor.forLiteral(val);
+    }
+}
+
+class Add implements Exp {
+    public final Exp a;
+    public final Exp b;
+
+    public Add(Exp a, Exp b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public <T> T accept(ExpVisitor<T> visitor) {
+        return visitor.forAdd(a, b);
+    }
+}
+
+class ExpEvalVisitor implements ExpVisitor<Integer> {
+    @Override
+    public Integer forLiteral(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer forAdd(Exp a, Exp b) {
+        return a.accept(this) + b.accept(this);
+    }
+}
+
+class ExpShowVisitor implements ExpVisitor<String> {
+    @Override
+    public String forLiteral(int v) {
+        return v + "";
+    }
+
+    @Override
+    public String forAdd(Exp a, Exp b) {
+        return "(" + a.accept(this) + "+" + b.accept(this) + ")";
+    }
+}
+
+interface ExpVisitor2<T> extends ExpVisitor<T> {
+    public T forDivide(Exp a, Exp b);
+}
+
+class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
+    @Override
+    public Integer forDivide(Exp a, Exp b) {
+        return a.accept(this)  / b.accept(this);
+    }
+}
+
+abstract class Exp2 {
+    public abstract <T> T accept(ExpVisitor2<T> visitor);
+}
+
+final class Divide extends Exp2 {
+    public final Exp a;
+    public final Exp b;
+
+    public Divide(Exp a, Exp b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public <T> T accept(ExpVisitor2<T> visitor) {
+        return visitor.forDivide(a, b);
+    }
+}
+```
+
+### Java object Algebras
+
+``` java
+
+package siegel.objectAlgebras;
+
+public class ObjectAlgebras {
+    public static void main(String[] args) {
+        System.out.println("nice!");
+        Eval e = new Eval();
+        int res = e.add(e.literal(1), e.literal(2));
+        System.out.println("result: " + res);
+
+        Eval2 e2 = new Eval2();
+        int res2 = e2.divide(e2.literal(4), e2.literal(2));
+        System.out.println("2 result: " + res2);
+    }
+}
+
+
+interface Exp<T> {
+    public T literal(int v);
+    public T add(T a, T b);
+}
+
+
+class Eval implements Exp<Integer> {
+    @Override
+    public Integer literal(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer add(Integer a, Integer b) {
+        return a + b;
+    }
+}
+
+class Show implements Exp<String> {
+    @Override
+    public String literal(int v) {
+        return v + "";
+    }
+
+    @Override
+    public String add(String a, String b) {
+        return "(" + a + "+" + b + ")";
+    }
+}
+
+interface Exp2<T> extends Exp<T> {
+    public T divide(T a, T b);
+}
+
+class Eval2 extends Eval implements Exp2<Integer> {
+    @Override
+    public Integer divide(Integer a, Integer b) {
+        return a / b;
+    }
+}
+
+```
+
+
+
+
 
 ## 参考资料
 
