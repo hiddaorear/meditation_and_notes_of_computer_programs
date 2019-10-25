@@ -17,3 +17,5 @@
 - [子龙山人](https://zilongshanren.com/post/2015-11-23-a-few-good-habit-i-keep-for-years/)
 
 - [刘未鹏 Mind Hacks 思维改变生活](http://mindhacks.cn/)
+
+- [白板编程浅谈——Why, What, How](http://lucida.me/blog/whiteboard-coding-demystified/)

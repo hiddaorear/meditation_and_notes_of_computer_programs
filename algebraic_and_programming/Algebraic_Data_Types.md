@@ -4,6 +4,8 @@
 
 ## 参考资料
 
+- [代数数据类型](https://www.zhihu.com/question/49249958/answer/116474414)
+
 - [F-Algebras](https://bartoszmilewski.com/2017/02/28/f-algebras/)
 
 - [Simple Algebraic Data Types](https://bartoszmilewski.com/2015/01/13/simple-algebraic-data-types/)
