@@ -203,10 +203,13 @@ export function useAsyncData(value, initData) {
 
 ## 资料
 
-[对React Hooks的一些思考](https://zhuanlan.zhihu.com/p/48264713)
+- [对React Hooks的一些思考](https://zhuanlan.zhihu.com/p/48264713)
+
+- [React Hooks - useState的简单工作原理](http://tech.colla.me/zh/show/react_hook_useState)
 
 ## change log
 
 - 2019/4/7 修订，备注Hooks资料在Lisp的Monad中
 - 2019/4/10 修订，补充实战方面的资料
+- 2019/10/11 凌晨3点修改，新增useState资料
 - 2019/4/29 补充useReducer, useState, useEffect, Custom的例子

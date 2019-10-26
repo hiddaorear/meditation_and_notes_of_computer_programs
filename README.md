@@ -14,6 +14,14 @@
 
 ## 文档
 
+### algebraic_and_programming
+
+- [todo Algebraic Effects](./algebraic_and_programming/Algebraic_Effects.md)
+
+- [todo Algebraic Data Types ](./algebraic_and_programming/Algebraic_Data_Types.md)
+
+- [todo Object Algebras ](./algebraic_and_programming/Object_Algebras.md)
+
 ### Lisp
 
 - [todo mathematics](./Lisp/mathematics.md)
@@ -23,8 +31,6 @@
 - [todo lexical scope](./Lisp/lexical_scope.md)
 
 - [todo type](./Lisp/type.md)
-
-- [todo Algebraic Effects](./Lisp/Algebraic_Effects.md)
 
 - [todo monad](./Lisp/monad.md)
 
@@ -69,9 +75,11 @@
 
 - [analytics](./front_end/analytics.md)
 
-- [todo browser rendering](./front_end/browser_rendering.md)
+- [todo shadow DOM](./front_end/shadow_dom.md)
 
 - [todo 前端表单校验的设计](./front_end/form_validation.md)
+
+- [todo ](./front_end/analytics.md)
 
 ### design patterns
 
@@ -147,3 +155,5 @@ Alan J. Perlis
 - 2019/8/28 新增并发文档
 
 - 2019/9/22 新增设计模式
+
+- 2019/10/18 更新目录
