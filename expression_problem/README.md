@@ -329,7 +329,78 @@ public static void insertion_sort(int[] arr) {
 
 ## OCaml
 
-### polymorphic variant
+### 变体(variant)实现expression
+
+``` OCaml
+(*定义表达式的类型：Int Negate Add*)
+type exp =
+  Int of int
+| Negate of exp
+| Add of exp * exp
+
+(*实现求值*)
+let rec eval  = function
+  | Int i -> i
+  | Negate e ->  -(eval e)
+  | Add(e1, e2) -> (eval e1 ) + (eval e2)
+(*实现把表达式转化为字符串*)
+let rec toString = function
+  | Int i -> string_of_int i
+  | Negate e -> "-(" ^ (toString e) ^ ")"
+  | Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+;;
+(*测试代码*)
+let res = toString (Add ((Negate (Int 5)), (Int 6)));;
+let num = eval (Add ((Negate (Int 5)), (Int 6)));;
+
+```
+variant实现的expression，表达式的类型是固定的，无法拓展。但操作可以随意添加，我们还可以添加其他操作，模式匹配保证了类型安全。如果操作支持的类型不全，模式匹配就会报错。
+
+我们实现toString的时候，忘记实现`Add`的，模式匹配就会报错：
+
+缺失`Add`实现toString的代码：
+``` OCaml
+let rec toString = function
+  | Int i -> string_of_int i
+  | Negate e -> "-(" ^ (toString e) ^ ")"
+```
+
+编译时的报错：
+
+``` OCaml
+File "exp.ml", line 11, characters 19-98:
+11 | ...................function
+12 |   | Int i -> string_of_int i
+13 |   | Negate e -> "-(" ^ (toString e) ^ ")"
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+```
+
+### 多态变体(polymorphic variant)
+
+使用多态变体实现exprssion，使得variant具有拓展能力。
+
+``` OCaml
+type exp =
+  [`Int of int
+  | `Negate of exp
+  | `Add of exp * exp]
+
+let rec eval  = function
+  | `Int i -> i
+  | `Negate e ->  -(eval e)
+  | `Add(e1, e2) -> (eval e1 ) + (eval e2)
+
+let rec toString = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+
+```
+
+但也失去模式匹配一大好处，无法检测是否覆盖所有类型。
+
+
 
 ### 类型约束
 
