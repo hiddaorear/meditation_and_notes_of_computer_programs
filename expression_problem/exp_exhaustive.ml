@@ -10,7 +10,7 @@ let rec eval  = function
   | `Negate e ->  -(eval e)
   | `Add(e1, e2) -> (eval e1 ) + (eval e2)
 
-let rec toString = function
+let rec toString : exp -> string = function
   | `Int i -> string_of_int i
   | `Negate e -> "-(" ^ (toString e) ^ ")"
   | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"

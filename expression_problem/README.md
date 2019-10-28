@@ -354,6 +354,7 @@ let res = toString (Add ((Negate (Int 5)), (Int 6)));;
 let num = eval (Add ((Negate (Int 5)), (Int 6)));;
 
 ```
+
 variant实现的expression，表达式的类型是固定的，无法拓展。但操作可以随意添加，我们还可以添加其他操作，模式匹配保证了类型安全。如果操作支持的类型不全，模式匹配就会报错。
 
 我们实现toString的时候，忘记实现`Add`的，模式匹配就会报错：
@@ -398,19 +399,229 @@ let rec toString = function
 
 ```
 
-但也失去模式匹配一大好处，无法检测是否覆盖所有类型。
+#### 多态变体的缺点
+
+但也失去模式匹配和类型推导的好处，无法检测是否覆盖所有类型。
 
 
+我们实现toString的时候，忘记实现`Add`的，模式匹配不再报错，可以直接通过编译。
 
-### 类型约束
+缺少`Add`的`toString`实现：
+
+``` OCaml
+let rec toString = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+
+```
+
+这时，需要手动写明函数的类型，如
+
+``` OCaml
+let rec toString : exp -> string = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+```
+
+此时，如果我们忘记实现`Add`的，就会报错：
+
+``` OCaml
+File "exp_exhaustive.ml", line 13, characters 35-116:
+13 | ...................................function
+14 |   | `Int i -> string_of_int i
+15 |   | `Negate e -> "-(" ^ (toString e) ^ ")"
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+`Add _
+```
+
+#### 多态变体的优点
+
+多态变体就有可拓展性，可以用多态变体解决expression problem。
+
+我们新增一种表达式。
+
+``` OCaml
+type new_exp = [ exp | `Sub of new_exp * new_exp]
+```
+
+支持eval求值操作和toString操作：
+
+``` OCaml
+let rec new_eval : new_exp -> int = function
+  | #exp as exp -> eval exp
+  | `Sub(e1, e2) -> (new_eval e1) - (new_eval e2)
+
+let rec new_toString : new_exp -> string = function
+  | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
+  | #exp as exp -> toString exp
+```
+
+完整可运行代码见附录。
 
 ## Java
 
+我们用Java来解决expression problem。在Java中，expression用Class来声明。与函数式编程语言相反，Java中很方便新增expression，新增Class即可。但新增操作就很不方便，需要去修改每一个表达式的Class，逐一加上新操作。解决这个拓展问题的办法是访问者模式(Visitor Pattern)。这个模式很厉害，是Friedman的《A Little Java, A Few Patterns》中讲解的模式。Friedman的Little系列的书，很厉害，如《The Little Typer》，讲dependently typed，如《The Little Schemer》，讲递归和Scheme。当然，系列书风格一致，类似于古希腊的柏拉图的《理想国》，很话痨，但很细致深刻。
+
 ### Visitor Pattern
+
+我们把操作抽象出去，集合在Class中，然后把这个Class，用参数传递各个expression的方法里。
+
+``` Java
+
+interface Exp {
+    <T> T accept(ExpVisitor<T> visitor);
+}
+
+interface ExpVisitor<T> {
+    public T forLiteral(int v);
+    public T forAdd(Exp a, Exp b);
+}
+
+
+// 定义expression
+class Literal implements Exp {
+    public final int val;
+
+    public Literal(int val) {
+        this.val = val;
+    }
+
+    public <T> T accept(ExpVisitor<T> visitor) {
+        return visitor.forLiteral(val);
+    }
+}
+
+// eval求值操作
+class ExpEvalVisitor implements ExpVisitor<Integer> {
+    @Override
+    public Integer forLiteral(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer forAdd(Exp a, Exp b) {
+        return a.accept(this) + b.accept(this);
+    }
+}
+
+```
+
+显然在观察者模式中，新增操作非常容易，直接`implements ExpVisitor`即可。
+
+完整代码见附录。
+
+我们拓展一下这个实现，新增一种操作：除法Divide。
+
+``` Java
+
+// 拓展接口
+interface ExpVisitor2<T> extends ExpVisitor<T> {
+    public T forDivide(Exp a, Exp b);
+}
+
+interface Exp2 {
+    public abstract <T> T accept(ExpVisitor2<T> visitor);
+}
+
+// 继承ExpEvalVisitor，拓展ExpEvalVisitor
+class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
+    @Override
+    public Integer forDivide(Exp a, Exp b) {
+        return a.accept(this)  / b.accept(this);
+    }
+}
+// 实现新的expression，除法
+class Divide implements Exp2 {
+    public final Exp a;
+    public final Exp b;
+
+    public Divide(Exp a, Exp b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public <T> T accept(ExpVisitor2<T> visitor) {
+        return visitor.forDivide(a, b);
+    }
+}
+
+```
 
 ### Object Algebras
 
-#### Algebras
+在观察者模式中，expression的Class实现，还可以进一步简化抽象，直接省略此class。
+
+``` Java
+
+interface Exp<T> {
+    public T literal(int v);
+    public T add(T a, T b);
+}
+
+
+class Eval implements Exp<Integer> {
+    @Override
+    public Integer literal(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer add(Integer a, Integer b) {
+        return a + b;
+    }
+}
+
+```
+
+新增方法
+
+``` Java
+
+class Show implements Exp<String> {
+    @Override
+    public String literal(int v) {
+        return v + "";
+    }
+
+    @Override
+    public String add(String a, String b) {
+        return "(" + a + "+" + b + ")";
+    }
+}
+
+```
+
+新增expression
+
+``` Java
+
+interface Exp2<T> extends Exp<T> {
+    public T divide(T a, T b);
+}
+
+class Eval2 extends Eval implements Exp2<Integer> {
+    @Override
+    public Integer divide(Integer a, Integer b) {
+        return a / b;
+    }
+}
+
+```
+
+完整可运行代码见附录。
+
+以上实现，被称之为Object Algebras。
+
+- Data type is generic factory interface
+- Operation is factory implementation
+- Easy to add variants(extend interface)
+- Easy to add operations(implement interface)
+
+![Object_Algebras](./Object_Algebras.png)
+
+通过extend和implement拓展原来的代码，Class之间有清晰的层次关系，我们可以类比Algebraic data types，这一系列的Class结构，和代数之间，也可以构造一个可逆映射(同构)。
 
 ## 反思
 
@@ -653,6 +864,10 @@ interface ExpVisitor2<T> extends ExpVisitor<T> {
     public T forDivide(Exp a, Exp b);
 }
 
+interface Exp2 {
+    public abstract <T> T accept(ExpVisitor2<T> visitor);
+}
+
 class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
     @Override
     public Integer forDivide(Exp a, Exp b) {
@@ -660,11 +875,9 @@ class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
     }
 }
 
-abstract class Exp2 {
-    public abstract <T> T accept(ExpVisitor2<T> visitor);
-}
 
-final class Divide extends Exp2 {
+
+class Divide implements Exp2 {
     public final Exp a;
     public final Exp b;
 
@@ -677,6 +890,8 @@ final class Divide extends Exp2 {
         return visitor.forDivide(a, b);
     }
 }
+
+
 ```
 
 ### Java object Algebras
