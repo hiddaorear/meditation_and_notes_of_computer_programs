@@ -1,16 +1,5 @@
 # Expression problem
 
-- [expresssion problem 简介 ](#expresssion problem 简介)
-    - [矩阵](#矩阵)
-- [OCaml](#OCaml)
-    - [polymorphic variant](#polymorphic variant)
-- [Java](#Java)
-    - [Visitor Pattern](#Visitor Pattern)
-    - [Object Algebras](#Object Algebras)
-- [JavaScript](#JavaScript)
-    - [visitor pattern](#visitor pattern)
-- [参考资料](#参考资料)
-
 > 密涅瓦的猫头鹰，只有在黄昏的时候才起飞
 -- 黑格尔
 
@@ -19,6 +8,344 @@
 
 > Java没有模式匹配，所以很多需要类似功能的人就得使用visitor pattern。为了所谓的“通用性”，他们往往把visitor pattern搞出多层继承关系，让你转几弯也搞不清楚到底哪个visitor才是干实事的。
 -- 王垠
+
+## expresssion problem 简介
+
+> The Expression Problem is a new name for an old problem.  The goal is to define a datatype by cases, where one can add new cases to the datatype and new functions over the datatype, without recompiling existing code, and while retaining static type safety (e.g., no casts).  For the concrete example, we take expressions as the data type, begin with one case (constants) and one function (evaluators), then add one more construct (plus) and one more function (conversion to a string).
+-- Philip Wadler
+
+![Expression Problem](./Expression_Problem_0.png)
+
+## OCaml
+
+## variant
+
+联合类型(sum)也称变体(variants)。
+
+联合类型来源于集合论中的不相交并集(disjoint union)。这个概念不同于并集(union)。
+
+两个集合A和B的并集是：`A∪B={x|x∈A∨x∈B}`
+
+不相交并集是指两个集合中所有的元素都合并到一个集合中，并且每一个集合的元素都带有原集合的标记。可以表示为：
+
+`A + B={(a, 0)|a∈A} ∪ {(b, 1)|b∈B}`
+
+其中，0是A的标记，1是B的标记。0和1可以用任意符号代替。在OCaml中，不相交并集的每一个集合，该集合的特征的标识符来做这个集合的标记，这个标记用于构造联合类型中的一个元素，因此也称为联合类型的构造子(constructor)。“构造子”通常指用于构造某种语言成分的标识符。
+
+构造子可以分为两类，一类带参数，另一类不带参数。后者称之为常量构造子，如：拥有常量构造子的联合类型相当于枚举类型，本身就是数据或者值。
+
+以上引用自陈钢的《OCaml语言编程与基础教程》
+
+### 变体(variant)实现expression
+
+``` OCaml
+(*定义表达式的类型：Int Negate Add*)
+type exp =
+  Int of int
+| Negate of exp
+| Add of exp * exp
+
+(*实现求值*)
+let rec eval  = function
+  | Int i -> i
+  | Negate e ->  -(eval e)
+  | Add(e1, e2) -> (eval e1 ) + (eval e2)
+(*实现把表达式转化为字符串*)
+let rec toString = function
+  | Int i -> string_of_int i
+  | Negate e -> "-(" ^ (toString e) ^ ")"
+  | Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+;;
+(*测试代码*)
+let res = toString (Add ((Negate (Int 5)), (Int 6)));;
+let num = eval (Add ((Negate (Int 5)), (Int 6)));;
+
+```
+
+variant实现的expression，表达式的类型是固定的，无法拓展。但操作可以随意添加，我们还可以添加其他操作，模式匹配保证了类型安全。如果操作支持的类型不全，模式匹配就会报错。
+
+![Expression Problem](./Expression_Problem_1.png)
+
+我们实现toString的时候，忘记实现`Add`的，模式匹配就会报错：
+
+缺失`Add`实现toString的代码：
+``` OCaml
+let rec toString = function
+  | Int i -> string_of_int i
+  | Negate e -> "-(" ^ (toString e) ^ ")"
+```
+
+编译时的报错：
+
+``` OCaml
+File "exp.ml", line 11, characters 19-98:
+11 | ...................function
+12 |   | Int i -> string_of_int i
+13 |   | Negate e -> "-(" ^ (toString e) ^ ")"
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+```
+### 多态变体(polymorphic variant)
+
+常规变体需要先定义，再使用，且在其他变体中不能使用。多态变体，可以直接使用，且多个多态变体可以共享构造子名字，使得我们可以在多态变体类型的基础上拓展。这与OCaml对子类型(subtyping)的支持紧密相关。子类型会带来大量的复杂性。
+
+多态变体缺点：
+1. 复杂性
+2. 错误查找。多态变体是类型安全的，不过由于其灵活性，他的类型约束不太可能捕获程序中的bug
+3. 效率。OCaml为匹配多态变体时，无法向常规变体那样生成同样高效的代码
+
+以上引用自《Real World OCaml》。
+
+如果一个类A中的方法都包含在另一个类B中，则A和B之间具有子类型关系。子类(subtyping)关系是子类型关系的一种特殊情况。subtyping是面向对象编程中的一个核心概念。决定了C类型的对象什么时候可以用在原本需要D类型对象的表达式中。
+
+### 多态变体(polymorphic variant)解决exprssion problem
+
+使用多态变体实现exprssion，使得variant具有拓展能力。
+
+``` OCaml
+type exp =
+  [`Int of int
+  | `Negate of exp
+  | `Add of exp * exp]
+
+let rec eval  = function
+  | `Int i -> i
+  | `Negate e ->  -(eval e)
+  | `Add(e1, e2) -> (eval e1 ) + (eval e2)
+
+let rec toString = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+
+```
+
+#### 多态变体的缺点
+
+但也失去模式匹配和类型推导的好处，无法检测是否覆盖所有类型。
+
+我们实现toString的时候，忘记实现`Add`的，模式匹配不再报错，可以直接通过编译。
+
+缺少`Add`的`toString`实现：
+
+``` OCaml
+let rec toString = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+
+```
+
+这时，需要手动写明函数的类型，如
+
+``` OCaml
+let rec toString : exp -> string = function
+  | `Int i -> string_of_int i
+  | `Negate e -> "-(" ^ (toString e) ^ ")"
+  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
+```
+
+此时，如果我们忘记实现`Add`的，就会报错：
+
+``` OCaml
+File "exp_exhaustive.ml", line 13, characters 35-116:
+13 | ...................................function
+14 |   | `Int i -> string_of_int i
+15 |   | `Negate e -> "-(" ^ (toString e) ^ ")"
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+`Add _
+```
+
+#### 多态变体的优点
+
+多态变体就有可拓展性，可以用多态变体解决expression problem。
+
+我们新增一种表达式。
+
+``` OCaml
+type new_exp = [ exp | `Sub of new_exp * new_exp]
+```
+
+支持eval求值操作和toString操作：
+
+``` OCaml
+let rec new_eval : new_exp -> int = function
+  | #exp as exp -> eval exp
+  | `Sub(e1, e2) -> (new_eval e1) - (new_eval e2)
+
+let rec new_toString : new_exp -> string = function
+  | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
+  | #exp as exp -> toString exp
+```
+
+完整可运行代码见附录。
+
+## Java
+
+我们用Java来解决expression problem。在Java中，expression用Class来声明。与函数式编程语言相反，Java中很方便新增expression，新增Class即可。但新增操作就很不方便，需要去修改每一个表达式的Class，逐一加上新操作。
+
+![Expression Problem](./Expression_Problem_2.png)
+
+解决这个拓展问题的办法是访问者模式(Visitor Pattern)。这个模式很厉害，是Friedman的《A Little Java, A Few Patterns》中讲解的模式。Friedman的Little系列的书，很厉害，如《The Little Typer》，讲dependently typed，如《The Little Schemer》，讲递归和Scheme。当然，系列书风格一致，类似于古希腊的柏拉图的《理想国》，很话痨，但很细致深刻。
+
+### Visitor Pattern
+
+我们把操作抽象出去，集合在Class中，然后把这个Class，用参数传递各个expression的方法里。
+
+``` Java
+
+interface Exp {
+    <T> T accept(ExpVisitor<T> visitor);
+}
+
+interface ExpVisitor<T> {
+    public T forLiteral(int v);
+    public T forAdd(Exp a, Exp b);
+}
+
+
+// 定义expression
+class Literal implements Exp {
+    public final int val;
+
+    public Literal(int val) {
+        this.val = val;
+    }
+
+    public <T> T accept(ExpVisitor<T> visitor) {
+        return visitor.forLiteral(val);
+    }
+}
+
+// eval求值操作
+class ExpEvalVisitor implements ExpVisitor<Integer> {
+    @Override
+    public Integer forLiteral(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer forAdd(Exp a, Exp b) {
+        return a.accept(this) + b.accept(this);
+    }
+}
+
+```
+
+显然在观察者模式中，新增操作非常容易，直接`implements ExpVisitor`即可。
+
+完整代码见附录。
+
+我们拓展一下这个实现，新增一种操作：除法Divide。
+
+``` Java
+
+// 拓展接口
+interface ExpVisitor2<T> extends ExpVisitor<T> {
+    public T forDivide(Exp a, Exp b);
+}
+
+interface Exp2 {
+    public abstract <T> T accept(ExpVisitor2<T> visitor);
+}
+
+// 继承ExpEvalVisitor，拓展ExpEvalVisitor
+class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
+    @Override
+    public Integer forDivide(Exp a, Exp b) {
+        return a.accept(this)  / b.accept(this);
+    }
+}
+// 实现新的expression，除法
+class Divide implements Exp2 {
+    public final Exp a;
+    public final Exp b;
+
+    public Divide(Exp a, Exp b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public <T> T accept(ExpVisitor2<T> visitor) {
+        return visitor.forDivide(a, b);
+    }
+}
+
+```
+
+### Object Algebras
+
+在观察者模式中，expression的Class实现，还可以进一步简化抽象，直接省略此class。
+
+``` Java
+
+interface Exp<T> {
+    public T literal(int v);
+    public T add(T a, T b);
+}
+
+
+class Eval implements Exp<Integer> {
+    @Override
+    public Integer literal(int v) {
+        return v;
+    }
+
+    @Override
+    public Integer add(Integer a, Integer b) {
+        return a + b;
+    }
+}
+
+```
+
+新增方法
+
+``` Java
+
+class Show implements Exp<String> {
+    @Override
+    public String literal(int v) {
+        return v + "";
+    }
+
+    @Override
+    public String add(String a, String b) {
+        return "(" + a + "+" + b + ")";
+    }
+}
+
+```
+
+新增expression
+
+``` Java
+
+interface Exp2<T> extends Exp<T> {
+    public T divide(T a, T b);
+}
+
+class Eval2 extends Eval implements Exp2<Integer> {
+    @Override
+    public Integer divide(Integer a, Integer b) {
+        return a / b;
+    }
+}
+
+```
+
+完整可运行代码见附录。
+
+以上实现，被称之为Object Algebras。
+
+- Data type is generic factory interface
+- Operation is factory implementation
+- Easy to add variants(extend interface)
+- Easy to add operations(implement interface)
+
+![Object_Algebras](./Object_Algebras.png)
+
+通过extend和implement拓展原来的代码，Class之间有清晰的层次关系，我们可以类比Algebraic data types，这一系列的Class结构，和代数之间，也可以构造一个可逆映射(同构)。
 
 ## Church计数
 
@@ -316,341 +643,128 @@ public static void insertion_sort(int[] arr) {
 2.  保持：内部for循环，把索引小于j的元素，右移一位，直到找到`arr[j]`的适当位置，然后插入此位置。此时，子数组`arr[0...j]`，已按照顺序排列。保持了循环不变式。
 3. 终止：当i大于`arr.length`时，终止。即`j = arr.length`。此时，`j = arr.length`，有：子数组`arr[0..arr.lenght]`已经按顺序排列。即，整个数组已排序。因此，算法正确。
 
-## expresssion problem 简介
-
-> The Expression Problem is a new name for an old problem.  The goal is to define a datatype by cases, where one can add new cases to the datatype and new functions over the datatype, without recompiling existing code, and while retaining static type safety (e.g., no casts).  For the concrete example, we take expressions as the data type, begin with one case (constants) and one function (evaluators), then add one more construct (plus) and one more function (conversion to a string).
--- Philip Wadler
-
-## OCaml
-
-## variant
-
-联合类型(sum)也称变体(variants)。
-
-联合类型来源于集合论中的不相交并集(disjoint union)。这个概念不同于并集(union)。
-
-两个集合A和B的并集是：`A∪B={x|x∈A∨x∈B}`
-
-不相交并集是指两个集合中所有的元素都合并到一个集合中，并且每一个集合的元素都带有原集合的标记。可以表示为：
-
-`A + B={(a, 0)|a∈A} ∪ {(b, 1)|b∈B}`
-
-其中，0是A的标记，1是B的标记。0和1可以用任意符号代替。在OCaml中，不相交并集的每一个集合，该集合的特征的标识符来做这个集合的标记，这个标记用于构造联合类型中的一个元素，因此也称为联合类型的构造子(constructor)。“构造子”通常指用于构造某种语言成分的标识符。
-
-构造子可以分为两类，一类带参数，另一类不带参数。后者称之为常量构造子，如：拥有常量构造子的联合类型相当于枚举类型，本身就是数据或者值。
-
-以上引用自陈钢的《OCaml语言编程与基础教程》
-
-### 变体(variant)实现expression
-
-``` OCaml
-(*定义表达式的类型：Int Negate Add*)
-type exp =
-  Int of int
-| Negate of exp
-| Add of exp * exp
-
-(*实现求值*)
-let rec eval  = function
-  | Int i -> i
-  | Negate e ->  -(eval e)
-  | Add(e1, e2) -> (eval e1 ) + (eval e2)
-(*实现把表达式转化为字符串*)
-let rec toString = function
-  | Int i -> string_of_int i
-  | Negate e -> "-(" ^ (toString e) ^ ")"
-  | Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
-;;
-(*测试代码*)
-let res = toString (Add ((Negate (Int 5)), (Int 6)));;
-let num = eval (Add ((Negate (Int 5)), (Int 6)));;
-
-```
-
-variant实现的expression，表达式的类型是固定的，无法拓展。但操作可以随意添加，我们还可以添加其他操作，模式匹配保证了类型安全。如果操作支持的类型不全，模式匹配就会报错。
-
-我们实现toString的时候，忘记实现`Add`的，模式匹配就会报错：
-
-缺失`Add`实现toString的代码：
-``` OCaml
-let rec toString = function
-  | Int i -> string_of_int i
-  | Negate e -> "-(" ^ (toString e) ^ ")"
-```
-
-编译时的报错：
-
-``` OCaml
-File "exp.ml", line 11, characters 19-98:
-11 | ...................function
-12 |   | Int i -> string_of_int i
-13 |   | Negate e -> "-(" ^ (toString e) ^ ")"
-Warning 8: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-```
-### 多态变体(polymorphic variant)
-
-常规变体需要先定义，再使用，且在其他变体中不能使用。多态变体，可以直接使用，且多个多态变体可以共享构造子名字，使得我们可以在多态变体类型的基础上拓展。这与OCaml对子类型(subtyping)的支持紧密相关。子类型会带来大量的复杂性。
-
-多态变体缺点：
-1. 复杂性
-2. 错误查找。多态变体是类型安全的，不过由于其灵活性，他的类型约束不太可能捕获程序中的bug
-3. 效率。OCaml为匹配多态变体时，无法向常规变体那样生成同样高效的代码
-
-以上引用自《Real World OCaml》。
-
-如果一个类A中的方法都包含在另一个类B中，则A和B之间具有子类型关系。子类(subtyping)关系是子类型关系的一种特殊情况。subtyping是面向对象编程中的一个核心概念。决定了C类型的对象什么时候可以用在原本需要D类型对象的表达式中。
-
-### 多态变体(polymorphic variant)解决exprssion problem
-
-使用多态变体实现exprssion，使得variant具有拓展能力。
-
-``` OCaml
-type exp =
-  [`Int of int
-  | `Negate of exp
-  | `Add of exp * exp]
-
-let rec eval  = function
-  | `Int i -> i
-  | `Negate e ->  -(eval e)
-  | `Add(e1, e2) -> (eval e1 ) + (eval e2)
-
-let rec toString = function
-  | `Int i -> string_of_int i
-  | `Negate e -> "-(" ^ (toString e) ^ ")"
-  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
-
-```
-
-#### 多态变体的缺点
-
-但也失去模式匹配和类型推导的好处，无法检测是否覆盖所有类型。
-
-我们实现toString的时候，忘记实现`Add`的，模式匹配不再报错，可以直接通过编译。
-
-缺少`Add`的`toString`实现：
-
-``` OCaml
-let rec toString = function
-  | `Int i -> string_of_int i
-  | `Negate e -> "-(" ^ (toString e) ^ ")"
-
-```
-
-这时，需要手动写明函数的类型，如
-
-``` OCaml
-let rec toString : exp -> string = function
-  | `Int i -> string_of_int i
-  | `Negate e -> "-(" ^ (toString e) ^ ")"
-  | `Add(e1, e2)  -> "(" ^ (toString e1) ^ "+" ^ (toString e2) ^ ")"
-```
-
-此时，如果我们忘记实现`Add`的，就会报错：
-
-``` OCaml
-File "exp_exhaustive.ml", line 13, characters 35-116:
-13 | ...................................function
-14 |   | `Int i -> string_of_int i
-15 |   | `Negate e -> "-(" ^ (toString e) ^ ")"
-Warning 8: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-`Add _
-```
-
-#### 多态变体的优点
-
-多态变体就有可拓展性，可以用多态变体解决expression problem。
-
-我们新增一种表达式。
-
-``` OCaml
-type new_exp = [ exp | `Sub of new_exp * new_exp]
-```
-
-支持eval求值操作和toString操作：
-
-``` OCaml
-let rec new_eval : new_exp -> int = function
-  | #exp as exp -> eval exp
-  | `Sub(e1, e2) -> (new_eval e1) - (new_eval e2)
-
-let rec new_toString : new_exp -> string = function
-  | `Sub(e1, e2) -> "(" ^ (new_toString e1) ^ "-" ^ (new_toString e2) ^ ")"
-  | #exp as exp -> toString exp
-```
-
-完整可运行代码见附录。
-
-## Java
-
-我们用Java来解决expression problem。在Java中，expression用Class来声明。与函数式编程语言相反，Java中很方便新增expression，新增Class即可。但新增操作就很不方便，需要去修改每一个表达式的Class，逐一加上新操作。解决这个拓展问题的办法是访问者模式(Visitor Pattern)。这个模式很厉害，是Friedman的《A Little Java, A Few Patterns》中讲解的模式。Friedman的Little系列的书，很厉害，如《The Little Typer》，讲dependently typed，如《The Little Schemer》，讲递归和Scheme。当然，系列书风格一致，类似于古希腊的柏拉图的《理想国》，很话痨，但很细致深刻。
-
-### Visitor Pattern
-
-我们把操作抽象出去，集合在Class中，然后把这个Class，用参数传递各个expression的方法里。
-
-``` Java
-
-interface Exp {
-    <T> T accept(ExpVisitor<T> visitor);
-}
-
-interface ExpVisitor<T> {
-    public T forLiteral(int v);
-    public T forAdd(Exp a, Exp b);
-}
-
-
-// 定义expression
-class Literal implements Exp {
-    public final int val;
-
-    public Literal(int val) {
-        this.val = val;
-    }
-
-    public <T> T accept(ExpVisitor<T> visitor) {
-        return visitor.forLiteral(val);
-    }
-}
-
-// eval求值操作
-class ExpEvalVisitor implements ExpVisitor<Integer> {
-    @Override
-    public Integer forLiteral(int v) {
-        return v;
-    }
-
-    @Override
-    public Integer forAdd(Exp a, Exp b) {
-        return a.accept(this) + b.accept(this);
-    }
-}
-
-```
-
-显然在观察者模式中，新增操作非常容易，直接`implements ExpVisitor`即可。
-
-完整代码见附录。
-
-我们拓展一下这个实现，新增一种操作：除法Divide。
-
-``` Java
-
-// 拓展接口
-interface ExpVisitor2<T> extends ExpVisitor<T> {
-    public T forDivide(Exp a, Exp b);
-}
-
-interface Exp2 {
-    public abstract <T> T accept(ExpVisitor2<T> visitor);
-}
-
-// 继承ExpEvalVisitor，拓展ExpEvalVisitor
-class ExpEvalVisitor2 extends ExpEvalVisitor implements ExpVisitor2<Integer> {
-    @Override
-    public Integer forDivide(Exp a, Exp b) {
-        return a.accept(this)  / b.accept(this);
-    }
-}
-// 实现新的expression，除法
-class Divide implements Exp2 {
-    public final Exp a;
-    public final Exp b;
-
-    public Divide(Exp a, Exp b) {
-        this.a = a;
-        this.b = b;
-    }
-
-    public <T> T accept(ExpVisitor2<T> visitor) {
-        return visitor.forDivide(a, b);
-    }
-}
-
-```
-
-### Object Algebras
-
-在观察者模式中，expression的Class实现，还可以进一步简化抽象，直接省略此class。
-
-``` Java
-
-interface Exp<T> {
-    public T literal(int v);
-    public T add(T a, T b);
-}
-
-
-class Eval implements Exp<Integer> {
-    @Override
-    public Integer literal(int v) {
-        return v;
-    }
-
-    @Override
-    public Integer add(Integer a, Integer b) {
-        return a + b;
-    }
-}
-
-```
-
-新增方法
-
-``` Java
-
-class Show implements Exp<String> {
-    @Override
-    public String literal(int v) {
-        return v + "";
-    }
-
-    @Override
-    public String add(String a, String b) {
-        return "(" + a + "+" + b + ")";
-    }
-}
-
-```
-
-新增expression
-
-``` Java
-
-interface Exp2<T> extends Exp<T> {
-    public T divide(T a, T b);
-}
-
-class Eval2 extends Eval implements Exp2<Integer> {
-    @Override
-    public Integer divide(Integer a, Integer b) {
-        return a / b;
-    }
-}
-
-```
-
-完整可运行代码见附录。
-
-以上实现，被称之为Object Algebras。
-
-- Data type is generic factory interface
-- Operation is factory implementation
-- Easy to add variants(extend interface)
-- Easy to add operations(implement interface)
-
-![Object_Algebras](./Object_Algebras.png)
-
-通过extend和implement拓展原来的代码，Class之间有清晰的层次关系，我们可以类比Algebraic data types，这一系列的Class结构，和代数之间，也可以构造一个可逆映射(同构)。
-
 ## 反思
 
 ### 误导的技术文章
 
+ Mu Xian Ming的OOP vs FP：用 Visitor 模式克服 OOP 的局限》中错误的OCaml实现：
+
+``` OCaml
+exception BadResult of string
+type exp =
+    Int    of int
+  | Negate of exp
+  | Add    of exp * exp
+let rec eval e =
+  match e with
+      Int _      -> e
+    | Negate e1  -> (match eval e1 with
+                        Int i -> Int (-i)
+                      | _ -> raise (BadResult "non-int in negation"))
+    | Add(e1,e2) -> (match (eval e1, eval e2) with
+                        (Int i, Int j) -> Int (i+j)
+                      | _ -> raise (BadResult "non-ints in addition"))
+let rec toString = function
+    Int i      -> string_of_int i
+  | Negate e1  -> "-(" ^ (toString e1) ^ ")"
+  | Add(e1,e2) -> "(" ^ (toString e1) ^ " + " ^ (toString e2) ^ ")"
+let rec hasZero = function
+    Int i      -> i = 0
+  | Negate e1  -> hasZero e1
+  | Add(e1,e2) -> (hasZero e1) || (hasZero e2)
+;;
+toString (eval (Add ((Negate (Int 5)), (Int 6))))
+(* - : string = "1" *)
+```
+
+以上代码用于举例说明，在expression problem这个场景中，函数式程序设计，易于增加方法，不易于增加类型。后面有一到两个星期，我都在思考，怎么拓展这段代码，用OCaml解决expression problem。
+
+而作者给出的解决方案，看起来似乎可行，可是实际上是错上加错。
+
+> 对于函数式模式来说，可以在类型定义中增加一个“其他”的类型，然后所有的函数都接受一个额外的函数类型的参数来处理“其他”的数据类型。
+
+``` OCaml
+type ’a ext_exp =
+    Int    of int
+  | Negate of ’a ext_exp
+  | Add    of ’a ext_exp * ’a ext_exp
+  | OtherExtExp  of ’a
+let rec eval_ext (f, e) =
+  match e with
+      Int i -> i
+    | Negate e1 -> 0 - (eval_ext (f, e1))
+    | Add (e1, e2) -> (eval_ext (f, e1)) + (eval_ext (f, e2))
+    | OtherExtExp e -> f e
+```
+
+第一次看到这段代码，以为用这种额外通用的办法是可以的。由于我函数式编程语言中，实际能编程的只有Scheme和OCaml，很多文章讲解expression problem都是用Haskell，而Haskell的处理是其语言的思路，根本不能借鉴到OCaml中。
+
+于是研究这个篇文章中的代码，花了很多时间，改模式匹配的代码，越改越复杂，生成非常复杂的类型错误。后面阅读到cornell CS 3110课程PPT，才恍然大悟，这个博客里最初的代码就是错误的，模式匹配根本就不对，而作者为了掩盖模式匹配错误，给每一个函数都加上了`_`匹配，然后扔掉，导致也不会报错。而正常的expression能匹配到其中正常的模式，使得这段有问题的代码，也能正常工作。这就造成了我当时百思不得其解的困境：我怀疑模式匹配写得有问题，可是他可以正常工作；当我试图修改这个代码，解决expression problem问题，无论怎么修改，模式匹配都是有问题的，且遇到非常复杂的类型报错。不可谓不坑。
+
+看这个作者的其他文章，应该对PL有所研究的人，可写出来的OCaml代码，模式匹配错误得一塌糊涂。同时，由于我对这个领域不熟悉，这算是初次有动手的尝试，之前只是看看别人的文章。万事开头难。
+
+### 错误的文章
+
+Anders Janmy 的《Solving the Expression Problem in Javascript》，试图用JavaScript解决expression problem，而JS的类型(dynamic style)显然不足以实现一个类型安全的代码。得益于JS的语言可以随意给对象或构造函数添加protype，JS实现expression，并具有拓展性，是很容易的事情。但这个显然意义不大，我们需要的是类型安全的实现。
+
+不过，这倒是可以看出JS不足以及优点。姑且记录一下其实现。
+
+> Now lets solve it with Javascript in a dynamic style. The solution we have looks a lot like the subtype polymorphic solution above.
+
+``` JavaScript
+
+function Add(e1, e2) {
+    this.e1 = e1;
+    this.e2 = e2;
+}
+Add.prototype.value = function() { return this.e1.value() + this.e2.value(); };
+
+function Sub(e1, e2) {
+    this.e1 = e1;
+    this.e2 = e2;
+}
+Sub.prototype.value = function() { return this.e1.value() - this.e2.value(); };
+
+function Num(n) {
+    this.n = n;
+}
+Num.prototype.value = function() { return this.n; };
+
+
+```
+
+> But, what about adding a new functions? It turns out that this is just as easy because of the dynamic nature of Javascript. We just add them to the prototype.
+
+``` JavaScript
+// Adding new functions to existing prototypes
+Add.prototype.toString = function() {
+  return '(' + this.e1.toString() + ' + ' + this.e2.toString() + ')';
+}
+Sub.prototype.toString = function() {
+  return '(' + this.e1.toString() + ' - ' + this.e2.toString() + ')';
+}
+Num.prototype.toString = function() {
+  return '' + this.n;
+}
+Mul.prototype.toString = function() {
+  return '(' + this.e1.toString() + ' * ' + this.e2.toString() + ')';
+}
+```
+> Now getting a string representation of an expression is a simple as:
+
+``` JavaScript
+var x = new Num(1);
+var y = new Num(2);
+var z = new Add(x, y);
+var w = new Sub(x, y);
+var e = new Mul(z, w);
+
+e.toString(); // returns ((1 + 2) * (1 - 2))
+```
+
 ### 概念的本质
+
+我觉得这个问题与subtyping，有深刻的联系，而subtyping我目前不能深入研究，暂且记录在这里，以后补上。估计要到读完《The Little Typer》以后。
 
 ## 参考资料
 
@@ -720,7 +834,10 @@ class Eval2 extends Eval implements Exp2<Integer> {
 - 2019/10/20 合并visitor模式文档
 
 - 2019/10/28 凌晨1点，完成代数和循环不变式
+
 - 2019/10/29 凌晨1点，完成OCaml多态类型部分，并学习subtyping概念
+
+- 2019/10/29 晚上10点，完成文章的初稿。研究这个课题，一个月有余
 
 ## 附录
 
