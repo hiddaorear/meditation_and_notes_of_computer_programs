@@ -19,3 +19,5 @@
 - [刘未鹏 Mind Hacks 思维改变生活](http://mindhacks.cn/)
 
 - [白板编程浅谈——Why, What, How](http://lucida.me/blog/whiteboard-coding-demystified/)
+
+- [面向对象-消息传递](https://zhenghe.gitbook.io/open-courses/mit-6.001-sicp/mian-xiang-dui-xiang-xiao-xi-chuan-di)
