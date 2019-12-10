@@ -87,6 +87,8 @@
 
 ### design patterns
 
+- [strategy](./design_patterns/strategy.md)
+
 - [MVC](./design_patterns/MVC.md)
 
 - [observer and pub sub pattern](./design_patterns/observer_and_pub_sub_pattern.md)
