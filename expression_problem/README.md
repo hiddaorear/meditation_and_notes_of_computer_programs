@@ -20,9 +20,35 @@
 
 ## 参考资料
 
+### 新参考资料
+
+- [sicp习题2.76如何解答？](https://www.zhihu.com/question/21617995)
+
+- [sicp-solutions](http://community.schemewiki.org/?sicp-solutions)
+
+- [Expression Problem](http://wiki.c2.com/?ExpressionProblem)
+
+- [sicp习题2.76如何解答？](https://www.zhihu.com/question/21617995)
+
+- [What is the 'expression problem'?](https://stackoverflow.com/questions/3596366/what-is-the-expression-problem/22180495#22180495)
+
+ - [Expression Problem 随想](https://lotabout.me/2018/Thoughts-on-Expression-Problem/)
+
+- [tagless final style](https://zhuanlan.zhihu.com/p/20834962)
+
+- [跟风：用Typed Racket解决表达式问题](https://zhuanlan.zhihu.com/p/53882197)
+
+- [第2届函数式编程分享随便记](https://zhuanlan.zhihu.com/p/20831552)
+
+
 ### 前端
 
 - [Immutable 详解及 React 中实践](https://github.com/camsong/blog/issues/3)
+
+- [React 优化技巧在 Web 版光线追踪里的应用(下)](https://zhuanlan.zhihu.com/p/73234221)
+
+- [实用函数式编程技巧：Combinator Pattern](https://zhuanlan.zhihu.com/p/73394292)
+
 
 ### design patterns
 
