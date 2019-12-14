@@ -21,3 +21,5 @@
 - [白板编程浅谈——Why, What, How](http://lucida.me/blog/whiteboard-coding-demystified/)
 
 - [面向对象-消息传递](https://zhenghe.gitbook.io/open-courses/mit-6.001-sicp/mian-xiang-dui-xiang-xiao-xi-chuan-di)
+
+- [王垠的个人主页](https://docs.huihoo.com/homepage/shredderyin/)
