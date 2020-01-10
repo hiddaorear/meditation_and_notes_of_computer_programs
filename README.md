@@ -107,6 +107,8 @@
 
 - [todo Gaussian Blur](./mathematics/Gaussian_Blur.md)
 
+- [统计学](./statistics/README.md)
+
 ### engineering
 
 - [代码圈复杂度](./engineering/cyclomatic_complexity.md)
