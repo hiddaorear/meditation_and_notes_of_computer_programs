@@ -254,6 +254,8 @@ int CaseConvert(const char *src, char *dst)
 
 - 其他情况，首选mutex
 
+#### SMP NUMA
+
 ## 分析的工具
 
 | 现象        | 工具           |
