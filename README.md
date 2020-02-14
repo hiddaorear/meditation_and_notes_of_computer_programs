@@ -48,6 +48,8 @@
 
 ### backend development
 
+- [Nginx](./backend_development/nginx.md)
+
 - [todo koa](./backend_development/koa.md)
 
 ### database
@@ -84,6 +86,8 @@
 - [todo 前端表单校验的设计](./front_end/form_validation.md)
 
 - [todo ](./front_end/analytics.md)
+
+- [ 前端项目管理 ](./front_end/front_end_management.md)
 
 ### design patterns
 
@@ -180,3 +184,5 @@ Alan J. Perlis
 - 2019/11/10 新增Racket语言写的interpreter
 
 - 2019/12/14 Docker
+
+- 2020/2/13 新增前端项目管理
