@@ -52,6 +52,10 @@
 
 - [todo koa](./backend_development/koa.md)
 
+### Linux
+
+- [Linux 基础](./linux/elementary.md)
+
 ### database
 
 - [todo SQL](./database/SQL.md)
@@ -186,3 +190,5 @@ Alan J. Perlis
 - 2019/12/14 Docker
 
 - 2020/2/13 新增前端项目管理
+
+- 2020/2/16 Linux基础
