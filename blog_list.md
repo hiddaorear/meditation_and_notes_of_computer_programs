@@ -2,6 +2,8 @@
 
 ## 编程
 
+- [emacs 懒猫](https://manateelazycat.github.io/index.html)
+
 - [千里冰封博客](https://ice1000.org/cn/)
 
 - [Hux Blog: 黄玄](https://huangxuan.me/)
