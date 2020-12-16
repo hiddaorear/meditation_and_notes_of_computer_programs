@@ -2,7 +2,7 @@
 
 ## 常用快捷键
 
-- 打开Terminal：`Alt+F12`
+- 打开Terminal：`Option+F12`
 
 ### refactor
 
