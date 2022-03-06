@@ -11,6 +11,29 @@
 - rabbitMQ
 - Swagger
 
+# TODO 资料阅读 
+
+## TS
+
+- https://zhuanlan.zhihu.com/p/372790745
+- https://www.tangshuang.net/8140.html
+- https://www.zhihu.com/question/515733651
+- https://github.com/type-challenges/type-challenges/blob/master/README.zh-CN.md
+- https://zhuanlan.zhihu.com/p/64446259
+- https://zhuanlan.zhihu.com/p/181696903
+- https://zhuanlan.zhihu.com/c_206498766
+- https://zhuanlan.zhihu.com/p/95829351
+- https://zhuanlan.zhihu.com/p/370000610
+- https://blog.rexskz.info/typescript-type-system-and-functional-programming.html
+- https://zhuanlan.zhihu.com/p/449762679
+
+## call/cc
+
+- https://www.zhihu.com/question/61222322
+
+## 广告资料
+
+- https://www.6aiq.com/article/1596333736250
 
 ## 文档
 
