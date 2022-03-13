@@ -4,7 +4,20 @@
 
 # TODO
 
-- https://zhuanlan.zhihu.com/p/372790745
+## Hooks
+
+- [hook使用](https://www.yuque.com/lxylona/note/tlc8hz)
+- [React Hooks 原理剖析](https://zhuanlan.zhihu.com/p/372790745)
+- [Build your own React](https://pomb.us/build-your-own-react/)
+- [【言简意赅，用简洁的实现理解hooks】Deep dive: How do React hooks really work?](https://www.netlify.com/blog/2019/03/11/deep-dive-how-do-react-hooks-really-work/)
+- [【演讲，非常值得听】How do React hooks really work?](https://www.youtube.com/watch?v=KJP1E-Y-xyo)
+
+## Algebraic Effects
+
+- [详解Algebraic Effects代数效应](https://zhuanlan.zhihu.com/p/380855727)
+- [聊聊代数效应（Algebraic Effects）](https://mongkii.com/blog/2021-05-08-talk-about-algebraic-effects)
+- [探索 React 的内在 — Fiber & Algebraic Effects](https://mp.weixin.qq.com/s/7MQp1CrZFwNd4dQ3y2C-UA)
+
 
 更多理论上的讨论见Lisp中Monad中的React Hooks条目。
 
