@@ -14,6 +14,7 @@
 
 ## Algebraic Effects
 
+- [写给那些搞不懂代数效应的我们（翻译）](https://zhuanlan.zhihu.com/p/76158581)
 - [详解Algebraic Effects代数效应](https://zhuanlan.zhihu.com/p/380855727)
 - [聊聊代数效应（Algebraic Effects）](https://mongkii.com/blog/2021-05-08-talk-about-algebraic-effects)
 - [探索 React 的内在 — Fiber & Algebraic Effects](https://mp.weixin.qq.com/s/7MQp1CrZFwNd4dQ3y2C-UA)
